@@ -1,0 +1,26 @@
+dist: trusty
+language: php
+
+php:
+  - 5.6
+  - 7.0
+  - 7.1
+  - hhvm
+
+before_install:
+  - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+  - sudo apt-get install --yes nodejs
+  - npm install -g grunt-cli
+
+install:
+  - npm install
+  - composer install
+
+script:
+  - grunt
+
+after_script:
+  - php vendor/bin/coveralls -v
+  - cat build/logs/coveralls-upload.json
+  - chmod +x code-climate-test-reporter
+  - CODECLIMATE_REPO_TOKEN=b32f5a91ed4993aa1f2e6bbc5a42f239af807125f5cfab14ce7b074e63786f8f ./code-climate-test-reporter
