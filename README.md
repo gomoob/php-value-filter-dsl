@@ -1,39 +1,59 @@
-# php-value filter dsl
+# php-value-filter-dsl
 
-> A PHP Library to easily send Facebook Messenger message with the REST Web Services.
+> Powerful filter DSL PHP library for REST Web Services query / URL parameters or other filtering needs.
 
-[![Total Downloads](https://img.shields.io/packagist/dt/gomoob/php-facebook-messenger.svg?style=flat)](https://packagist.org/packages/gomoob/php-facebook-messenger)
-[![Latest Stable Version](https://img.shields.io/packagist/v/gomoob/php-facebook-messenger.svg?style=flat)](https://packagist.org/packages/gomoob/php-facebook-messenger)
-[![Build Status](https://img.shields.io/travis/gomoob/php-facebook-messenger.svg?style=flat)](https://travis-ci.org/gomoob/php-facebook-messenger)
-[![Coverage](https://img.shields.io/coveralls/gomoob/php-facebook-messenger.svg?style=flat)](https://coveralls.io/r/gomoob/php-facebook-messenger?branch=master)
-[![Code Climate](https://img.shields.io/codeclimate/github/gomoob/php-facebook-messenger.svg?style=flat)](https://codeclimate.com/github/gomoob/php-facebook-messenger)
-[![License](https://img.shields.io/packagist/l/gomoob/php-facebook-messenger.svg?style=flat)](https://packagist.org/packages/gomoob/php-facebook-messenger)
+[![Total Downloads](https://img.shields.io/packagist/dt/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
+[![Latest Stable Version](https://img.shields.io/packagist/v/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
+[![Build Status](https://img.shields.io/travis/gomoob/php-value-filter-dsl.svg?style=flat)](https://travis-ci.org/gomoob/php-value-filter-dsl)
+[![Coverage](https://img.shields.io/coveralls/gomoob/php-value-filter-dsl.svg?style=flat)](https://coveralls.io/r/gomoob/php-value-filter-dsl?branch=master)
+[![Code Climate](https://img.shields.io/codeclimate/github/gomoob/php-value-filter-dsl.svg?style=flat)](https://codeclimate.com/github/gomoob/php-value-filter-dsl)
+[![License](https://img.shields.io/packagist/l/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
 
-## First sample, creating a Facebook Messenger text message
+## Sample with not in
 
-```php
-// Create a Facebook Messenger client
-$client = Client::create()->setPageAccessToken('XXXX-XXX');
+Suppose you have a Web Service accessible using `https://api.myserver.com/users` and you want to create a filter to find
+users not having a first name equals to `Jack` or `Joe`, or `Willian` or `Averell`.
 
-// Create a request to send a simple Text Message
-$request = TextMessageRequest::create()
-    ->setRecipient(Recipient::create()->setId('USER_ID'))
-    ->setMessage(TextMessage::create()->setText('hello, world !'));
+To do this you'll have to request your relationnal database with a `not in` SQL request. The `php-value-filter-dsl`
+library allows you to parse a custom filter expression and convert it into an SQL expression you can use in your SQL
+query builder.
 
-// Call the REST Web Service
-$response = $client->sendMessage($textMessageRequest);
+Our filter expression language is a custom one designed by Gomoob to respond to lots of REST Web Services API filtering
+needs, this filter is described in the documentation.
 
-// Check if its ok
-if($response->isOk()) {
-    print 'Great, the message has been sent !';
-} else {
-    print 'Oups, the sent failed :-(';
-    print 'Status code : ' . $response->getStatusCode();
-    print 'Status message : ' . $response->getStatusMessage();
-}
+Filtering to exclude the 4 first names described previously would be done using the following URL.
+
+```
+https://api.myserver.com/users?first_name=!in('Jack','Joe','Willian','Averell')
 ```
 
-Easy, isn't it ?
+The PHP source code used to parse the filter expression (i.e the `first_name` URL query parameter value) is the
+following.
+
+```php
+// Suppose we are inside a controller (for example inside a PSR-7 Middleware) and we got the value of the 'first_name'
+// URL query parameter from "https://api.myserver.com/users?first_name=!in('Jack','Joe','Willian','Averell')"
+$urlParameterName = 'first_name';
+$urlParameterValue = "!in('Jack','Joe','Willian','Averell')";
+
+// Parsing the filter expression
+$filterConverter = new SqlFilterConverter();
+$sqlFilterExpressionAndParameters = $this->filterConverter->transform($urlParameterName, $urlParameterValue);
+
+// Use the parsed result to build our SQL query
+$preparedStatement = $pdo->prepare('select * from users where ' . $sqlFilterExpressionAndParameters[0]);
+
+$i = 1;
+foreach($sqlExpressionAndParameter[1] as $paramValue) {
+    $preparedStatement->bindParam($i++, paramValue);
+}
+
+// Executes our query
+$pdo->execute();
+```
+
+The previous sample will execute the SQL query `select * from users where first_name not in('?','?','?','?')` with the
+prepared statement parameters `Jack`, `Joe`, `Willian`, `Averell`.
 
 ## Documentation
 
