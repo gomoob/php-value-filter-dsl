@@ -12,16 +12,16 @@
 ## Sample with not in
 
 Suppose you have a Web Service accessible using `https://api.myserver.com/users` and you want to create a filter to find
-users not having a first name equals to `Jack` or `Joe`, or `Willian` or `Averell`.
+users not having a first name equals to `Jack`, `Joe`, `Willian` or `Averell`.
 
 To do this you'll have to request your relationnal database with a `not in` SQL request. The `php-value-filter-dsl`
-library allows you to parse a custom filter expression and convert it into an SQL expression you can use in your SQL
-query builder.
+library allows you to parse a custom filter expression from an URL query parameter and convert it into an equivalent SQL
+expression you can use in your SQL query builder.
 
 Our filter expression language is a custom one designed by Gomoob to respond to lots of REST Web Services API filtering
-needs, this filter is described in the documentation.
+needs, this filter expression is thorougly described in our documentation.
 
-Filtering to exclude the 4 first names described previously would be done using the following URL.
+Filtering to exclude the 4 first names described previously would be done using the following GET HTTP request.
 
 ```
 https://api.myserver.com/users?first_name=!in('Jack','Joe','Willian','Averell')
@@ -54,6 +54,11 @@ $pdo->execute();
 
 The previous sample will execute the SQL query `select * from users where first_name not in('?','?','?','?')` with the
 prepared statement parameters `Jack`, `Joe`, `Willian`, `Averell`.
+
+Very simple and useful, isn't it ?
+
+Please note that for now we only provide convertion of our filters into SQL, but will extend the library to provide
+additional converters to transform the filters into other formats.
 
 ## Documentation
 
