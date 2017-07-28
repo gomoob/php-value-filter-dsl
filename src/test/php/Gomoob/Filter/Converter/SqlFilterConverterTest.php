@@ -35,7 +35,8 @@ use PHPUnit\Framework\TestCase;
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  * @group SqlFilterConverterTest
  */
-class SqlFilterConverterTest extends TestCase {
+class SqlFilterConverterTest extends TestCase
+{
 
     /**
      * An instance of the SQL filter converter to test.
@@ -57,7 +58,8 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransform
      */
-    public function testTransform() {
+    public function testTransform()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', '10');
@@ -83,7 +85,8 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformEqualTo
      */
-    public function testTransformEqualTo() {
+    public function testTransformEqualTo()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', '=10');
@@ -115,25 +118,26 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformGreaterThan
      */
-    public function testTransformGreaterThan() {
+    public function testTransformGreaterThan()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', ">10");
         $this->assertSame('property > ?', $res[0]);
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', ">54.12");
         $this->assertSame('property > ?', $res[0]);
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple date and time
         $res = $this->filterConverter->transform('property', ">'2017-01-01T00:09:01+01:00'");
         $this->assertSame('property > ?', $res[0]);
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("2017-01-01T00:09:01+01:00");
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('2017-01-01T00:09:01+01:00', $res[1][0]);
     }
 
     /**
@@ -141,25 +145,26 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformGreaterThanOrEqual
      */
-    public function testTransformGreaterThanOrEqual() {
+    public function testTransformGreaterThanOrEqual()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', ">=10");
-        assertThat($res->getKey()).isEqualTo("property >= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $this->assertSame('property >= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', ">=54.12");
-        assertThat($res->getKey()).isEqualTo("property >= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertSame('property >= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple date and time
         $res = $this->filterConverter->transform('property', ">='2017-01-01T00:09:01+01:00'");
-        assertThat($res->getKey()).isEqualTo("property >= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("2017-01-01T00:09:01+01:00");
+        $this->assertSame('property >= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('2017-01-01T00:09:01+01:00', $res[1][0]);
     }
 
     /**
@@ -167,25 +172,26 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformLessThan
      */
-    public function testTransformLessThan() {
+    public function testTransformLessThan()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "<10");
-        assertThat($res->getKey()).isEqualTo("property < ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $this->assertSame('property < ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', "<54.12");
-        assertThat($res->getKey()).isEqualTo("property < ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertSame('property < ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple date and time
         $res = $this->filterConverter->transform('property', "<'2017-01-01T00:09:01+01:00'");
-        assertThat($res->getKey()).isEqualTo("property < ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("2017-01-01T00:09:01+01:00");
+        $this->assertSame('property < ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('2017-01-01T00:09:01+01:00', $res[1][0]);
     }
 
     /**
@@ -193,25 +199,26 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformLessThanOrEqual
      */
-    public function testTransformLessThanOrEqual() {
+    public function testTransformLessThanOrEqual()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "<=10");
-        assertThat($res->getKey()).isEqualTo("property <= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $this->assertSame('property <= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', "<=54.12");
-        assertThat($res->getKey()).isEqualTo("property <= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertSame('property <= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple date and time
         $res = $this->filterConverter->transform('property', "<='2017-01-01T00:09:01+01:00'");
-        assertThat($res->getKey()).isEqualTo("property <= ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("2017-01-01T00:09:01+01:00");
+        $this->assertSame('property <= ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('2017-01-01T00:09:01+01:00', $res[1][0]);
     }
 
     /**
@@ -219,31 +226,32 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformIn
      */
-    public function testTransformIn() {
+    public function testTransformIn()
+    {
 
         // Test with an in and only integers
         $res = $this->filterConverter->transform('property', "in(5,12,3)");
-        assertThat($res->getKey()).isEqualTo("property in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo(5);
-        assertThat($res->getValue().get(1)).isEqualTo(12);
-        assertThat($res->getValue().get(2)).isEqualTo(3);
+        $this->assertSame('property in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame(5, $res[1][0]);
+        $this->assertSame(12, $res[1][1]);
+        $this->assertSame(3, $res[1][2]);
 
         // Test with an in and only floats
         $res = $this->filterConverter->transform('property', "in(5.34,2.1,3.89)");
-        assertThat($res->getKey()).isEqualTo("property in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo(5.34);
-        assertThat($res->getValue().get(1)).isEqualTo(2.1);
-        assertThat($res->getValue().get(2)).isEqualTo(3.89);
+        $this->assertSame('property in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame(5.34, $res[1][0]);
+        $this->assertSame(2.1, $res[1][1]);
+        $this->assertSame(3.89, $res[1][2]);
 
         // Test with an in and only strings
         $res = $this->filterConverter->transform('property', "in('string 1','string 2','string 3')");
-        assertThat($res->getKey()).isEqualTo("property in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo("string 1");
-        assertThat($res->getValue().get(1)).isEqualTo("string 2");
-        assertThat($res->getValue().get(2)).isEqualTo("string 3");
+        $this->assertSame('property in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame('string 1', $res[1][0]);
+        $this->assertSame('string 2', $res[1][1]);
+        $this->assertSame('string 3', $res[1][2]);
     }
 
     /**
@@ -251,37 +259,38 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformLike
      */
-    public function testTransformLike() {
+    public function testTransformLike()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "~10");
-        assertThat($res->getKey()).isEqualTo("cast(property as varchar(32)) like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%10%");
+        $this->assertSame('cast(property as varchar(32)) like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%10%', $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', "~54.12");
-        assertThat($res->getKey()).isEqualTo("cast(property as varchar(32)) like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%54.12%");
+        $this->assertSame('cast(property as varchar(32)) like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%54.12%', $res[1][0]);
 
         // Test with a simple string
         $res = $this->filterConverter->transform('property', "~'Sample string'");
-        assertThat($res->getKey()).isEqualTo("property like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%Sample string%");
+        $this->assertSame('property like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%Sample string%', $res[1][0]);
 
         // Test with a string having '*' symbols
         $res = $this->filterConverter->transform('property', "~'word1 *word word3'");
-        assertThat($res->getKey()).isEqualTo("property like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%word1 %word word3%");
+        $this->assertSame('property like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%word1 %word word3%', $res[1][0]);
 
         // Test with a string having '*' symbols
         $res = $this->filterConverter->transform('property', "~'*word1 *word word3*'");
-        assertThat($res->getKey()).isEqualTo("property like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%word1 %word word3%");
+        $this->assertSame('property like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%word1 %word word3%', $res[1][0]);
     }
 
     /**
@@ -289,25 +298,26 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNot
      */
-    public function testTransformNot() {
+    public function testTransformNot()
+    {
 
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "!10");
-        assertThat($res->getKey()).isEqualTo("property = !?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $this->assertSame('property = !?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', "!54.12");
-        assertThat($res->getKey()).isEqualTo("property = !?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertSame('property = !?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple string
         $res = $this->filterConverter->transform('property', "!'Sample string'");
-        assertThat($res->getKey()).isEqualTo("property = !?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("Sample string");
+        $this->assertSame('property = !?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('Sample string', $res[1][0]);
     }
 
     /**
@@ -315,31 +325,32 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotEqualTo
      */
-    public function testTransformNotEqualTo() {
+    public function testTransformNotEqualTo()
+    {
 
         // Test with a simple integer
-        $res = $this->filterConverter->transform('property', "!=10");
-        assertThat($res->getKey()).isEqualTo("property != ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(10);
+        $res = $this->filterConverter->transform('property', '!=10');
+        $this->assertSame('property != ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(10, $res[1][0]);
 
         // Test with a simple float
         $res = $this->filterConverter->transform('property', "!=54.12");
-        assertThat($res->getKey()).isEqualTo("property != ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo(54.12);
+        $this->assertSame('property != ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame(54.12, $res[1][0]);
 
         // Test with a simple string
         $res = $this->filterConverter->transform('property', "!='Sample string'");
-        assertThat($res->getKey()).isEqualTo("property != ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("Sample string");
+        $this->assertSame('property != ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('Sample string', $res[1][0]);
 
         // Test with a string having '*' symbols
         $res = $this->filterConverter->transform('property', "!='*word1 *word2*'");
-        assertThat($res->getKey()).isEqualTo("property not like ?");
-        assertThat($res->getValue()).hasSize(1);
-        assertThat($res->getValue().get(0)).isEqualTo("%word1 %word2%");
+        $this->assertSame('property not like ?', $res[0]);
+        $this->assertCount(1, $res[1]);
+        $this->assertSame('%word1 %word2%', $res[1][0]);
     }
 
     /**
@@ -347,12 +358,13 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotGreaterThan
      */
-    public function testTransformNotGreaterThan() {
+    public function testTransformNotGreaterThan()
+    {
 
         try {
             $this->filterConverter->transform('property', "!>10");
         } catch (ConverterException $cex) {
-            assertThat(cex.getMessage()).isEqualTo("Using the '!' operator before the '>' operator is forbidden !");
+            $this->assertSame("Using the '!' operator before the '>' operator is forbidden !", $cex->getMessage());
         }
     }
 
@@ -361,12 +373,13 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotGreaterThanOrEqual
      */
-    public function testTransformNotGreaterThanOrEqual() {
+    public function testTransformNotGreaterThanOrEqual()
+    {
 
         try {
             $this->filterConverter->transform('property', "!>=10");
         } catch (ConverterException $cex) {
-            assertThat(cex.getMessage()).isEqualTo("Using the '!' operator before the '>=' operator is forbidden !");
+            $this->assertSame("Using the '!' operator before the '>=' operator is forbidden !", $cex->getMessage());
         }
     }
 
@@ -375,12 +388,13 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotLessThan
      */
-    public function testTransformNotLessThan() {
+    public function testTransformNotLessThan()
+    {
 
         try {
             $this->filterConverter->transform('property', "!<10");
         } catch (ConverterException $cex) {
-            assertThat(cex.getMessage()).isEqualTo("Using the '!' operator before the '<' operator is forbidden !");
+            $this->assertSame("Using the '!' operator before the '<' operator is forbidden !", $cex->getMessage());
         }
     }
 
@@ -389,12 +403,13 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotLessThanOrEqual
      */
-    public function testTransformNotLessThanOrEqual() {
+    public function testTransformNotLessThanOrEqual()
+    {
 
         try {
             $this->filterConverter->transform('property', "!<=10");
         } catch (ConverterException $cex) {
-            assertThat(cex.getMessage()).isEqualTo("Using the '!' operator before the '<=' operator is forbidden !");
+            $this->assertSame("Using the '!' operator before the '<=' operator is forbidden !", $cex->getMessage());
         }
     }
 
@@ -403,31 +418,32 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotIn
      */
-    public function testTransformNotIn() {
+    public function testTransformNotIn()
+    {
 
         // Test with an in and only integers
         $res = $this->filterConverter->transform('property', "!in(5,12,3)");
-        assertThat($res->getKey()).isEqualTo("property not in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo(5);
-        assertThat($res->getValue().get(1)).isEqualTo(12);
-        assertThat($res->getValue().get(2)).isEqualTo(3);
+        $this->assertSame('property not in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame(5, $res[1][0]);
+        $this->assertSame(12, $res[1][1]);
+        $this->assertSame(3, $res[1][2]);
 
         // Test with an in and only floats
         $res = $this->filterConverter->transform('property', "!in(5.34,2.1,3.89)");
-        assertThat($res->getKey()).isEqualTo("property not in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo(5.34);
-        assertThat($res->getValue().get(1)).isEqualTo(2.1);
-        assertThat($res->getValue().get(2)).isEqualTo(3.89);
+        $this->assertSame('property not in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame(5.34, $res[1][0]);
+        $this->assertSame(2.1, $res[1][1]);
+        $this->assertSame(3.89, $res[1][2]);
 
         // Test with an in and only strings
         $res = $this->filterConverter->transform('property', "!in('string 1','string 2','string 3')");
-        assertThat($res->getKey()).isEqualTo("property not in(?,?,?)");
-        assertThat($res->getValue()).hasSize(3);
-        assertThat($res->getValue().get(0)).isEqualTo("string 1");
-        assertThat($res->getValue().get(1)).isEqualTo("string 2");
-        assertThat($res->getValue().get(2)).isEqualTo("string 3");
+        $this->assertSame('property not in(?,?,?)', $res[0]);
+        $this->assertCount(3, $res[1]);
+        $this->assertSame('string 1', $res[1][0]);
+        $this->assertSame('string 2', $res[1][1]);
+        $this->assertSame('string 3', $res[1][2]);
     }
 
     /**
@@ -435,14 +451,17 @@ class SqlFilterConverterTest extends TestCase {
      *
      * @group SqlFilterConverterTest.testTransformNotLike
      */
-    public function testTransformNotLike() {
+    public function testTransformNotLike()
+    {
 
         try {
             $this->filterConverter->transform('property', "!~10");
         } catch (ConverterException $cex) {
-            assertThat(cex.getMessage()).isEqualTo(
-                    "Using the '!' operator before the '~' is currently not supported, please used the '!' operator "
-                            + "with a string having '*' characters instead !");
+            $this->assertSame(
+                "Using the '!' operator before the '~' is currently not supported, please used the '!' operator "
+                . "with a string having '*' characters instead !",
+                $cex->getMessage()
+            );
         }
     }
 }
