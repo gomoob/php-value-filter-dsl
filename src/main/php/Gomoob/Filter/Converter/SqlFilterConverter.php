@@ -28,7 +28,11 @@
 namespace Gomoob\Filter\Converter;
 
 use Gomoob\Filter\SqlFilterConverterInterface;
-use Gomoob\Filter\TokenInterface;
+
+use Gomoob\Filter\Tokenizer\FilterToken;
+use Gomoob\Filter\Tokenizer\FilterTokenizer;
+use Gomoob\Filter\Tokenizer\TokenizerException;
+use Gomoob\Filter\Tokenizer\StarTokenizer;
 
 /**
  * Class which represents a converter to convert Gomoob query filters into SQL.
@@ -40,23 +44,16 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
     /**
      * {@inheritDoc}
      */
-    public function transform($key, /* string */ $value) /* : array */ {
-        return $this->transform(key, value, new HashMap<String, Object>());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function transform($key, /* string */ $value, /* array */ $context) /* : array */ {
+    public function transform($key, /* string */ $value, /* array */ $context = []) /* : array */ {
         $sqlFilterWithParams = null;
 
         // If the key is a string then the filter is a simple filter
-        if (key instanceof String) {
-            $sqlFilterWithParams = $this->transformSimpleFilter((String) key, value, context);
+        if (is_string($key)) {
+            $sqlFilterWithParams = $this->transformSimpleFilter($key, $value, $context);
         }
 
         // If the key is an integer then the filter is a complex filter
-        else if (key instanceof Integer) {
+        else if (is_int($key)) {
             throw new ConverterException('Complex filters are currently not implemented !');
         }
 
@@ -65,7 +62,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
             throw new ConverterException('Invalid filter key class !');
         }
 
-        return sqlFilterWithParams;
+        return $sqlFilterWithParams;
     }
 
     /**
@@ -79,22 +76,22 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
         $sqlString = '';
 
         switch ($token->getTokenCode()) {
-        case FilterToken.EQUAL_TO:
+        case FilterToken::EQUAL_TO:
             $sqlString = '=';
             break;
-        case FilterToken.GREATER_THAN:
+        case FilterToken::GREATER_THAN:
             $sqlString = '>';
             break;
-        case FilterToken.GREATER_THAN_OR_EQUAL:
+        case FilterToken::GREATER_THAN_OR_EQUAL:
             $sqlString = '>=';
             break;
-        case FilterToken.LESS_THAN:
+        case FilterToken::LESS_THAN:
             $sqlString = '<';
             break;
-        case FilterToken.LESS_THAN_OR_EQUAL:
+        case FilterToken::LESS_THAN_OR_EQUAL:
             $sqlString = '<=';
             break;
-        case FilterToken.NOT:
+        case FilterToken::NOT:
             $sqlString = '!';
             break;
         default:
@@ -113,100 +110,100 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
      */
     private function extractUnquotedString(/* TokenInterface */ $token) /* : string */ {
         $string = $token->getSequence();
-
-        return $string.substring(1, $string.length() - 1);
+        return substr($string, 1, strlen($string) - 2);
     }
 
     /**
      * Parse a filter expression from the first encountered token.
      *
-     * @param key the filter key.
-     * @param value the filter expression.
-     * @param tokens the tokens extracted by the filter expression tokenize.
-     * @param afterNot boolean used to indicate if the filter to analyse is a sub part of a filter containing a '!'
-     *            operator.
+     * @param string $key the filter key.
+     * @param string $value the filter expression.
+     * @param array $tokens the tokens extracted by the filter expression tokenize.
+     * @param bool $afterNot boolean used to indicate if the filter to analyse is a sub part of a filter containing a '!'
+     *        operator.
      *
-     * @return a key / value pair which maps the resulting SQL filter with its prepared statement parameters.
+     * @return array a key / value pair which maps the resulting SQL filter with its prepared statement parameters.
      */
-    private Map.Entry<String, List<? extends Serializable>> parseFromFirstToken(final String key, final String value,
-            final List<IToken> tokens, final boolean afterNot) {
-        StringBuilder sb = new StringBuilder();
-        List<Serializable> args = new ArrayList<>();
+    private function /* array */ parseFromFirstToken(
+        /* string */ $key, /* string */ $value, /* array */ $tokens, /* boolean */ $afterNot
+    ) {
+        $sb = '';
+        $args = [];
 
-        IToken firstToken = tokens.get(0);
-        IToken secondToken = null;
+        $firstToken = $tokens[0];
+        $secondToken = null;
 
-        switch (firstToken.getTokenCode()) {
+        switch ($firstToken->getTokenCode()) {
         // The first token is a simple operator
-        case FilterToken.EQUAL_TO:
+        case FilterToken::EQUAL_TO:
 
             // If their is not only 2 token then this is an error (this will not be the case when we'll have
             // support for parenthesis)
-            if (tokens.size() != 2) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            if (count($tokens) !== 2) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             // Now parse the value
-            secondToken = tokens.get(1);
+            $secondToken = $tokens[1];
 
-            switch (secondToken.getTokenCode()) {
-            case FilterToken.NUMBER:
+            switch ($secondToken->getTokenCode()) {
+            case FilterToken::NUMBER:
 
                 // If the '=' expression is not after a '!' operator
-                if (!afterNot) {
-                    sb.append(key);
-                    sb.append(' ');
+                if (!$afterNot) {
+                    $sb .= $key;
+                    $sb .= ' ';
                 }
 
-                sb.append(this.convertSimpleOperatorTokenToSqlString(firstToken));
-                sb.append(" ?");
-                args.add(this.parseNumberToken(secondToken));
+                $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
+                $sb .= ' ?';
+                $args[] = $this->parseNumberToken($secondToken);
                 break;
-            case FilterToken.STRING:
+            case FilterToken::STRING:
 
                 // Try to find star tokens to know if the query if for a 'like'
-                ITokenizer starTokenizer = new StarTokenizer();
-                List<IToken> starTokens = starTokenizer.tokenize(this.extractUnquotedString(secondToken));
+                $starTokenizer = new StarTokenizer();
+                $starTokens = $starTokenizer->tokenize($this->extractUnquotedString($secondToken));
 
                 // The SQL instruction to build must contain a 'like'
-                if (starTokens.size() > 1) {
-                    String likeString = "";
+                if (count($starTokens) > 1) {
+                    $likeString = '';
 
                     // If the '=' expression is not after a '!' operator
-                    if (!afterNot) {
-                        sb.append(key);
+                    if (!$afterNot) {
+                        $sb .= $key;
                     }
 
                     // If the '=' expression is after a '!' operator
                     else {
-                        sb.append("not");
+                        $sb .= 'not';
                     }
 
-                    sb.append(" like ?");
+                    $sb .= ' like ?';
 
-                    for (IToken starToken : starTokens) {
-                        if ("*".equals(starToken.getSequence())) {
-                            likeString += "%";
+                    foreach ($starTokens as $starToken) {
+                        if ('*' === $starToken->getSequence()) {
+                            $likeString .= '%';
                         } else {
-                            likeString += starToken.getSequence();
+                            $likeString .= $starToken->getSequence();
                         }
                     }
 
-                    args.add(likeString);
+                    $args[] = $likeString;
                 }
 
                 // The SQL instruction to construct is a simple equality
                 else {
 
                     // If the '=' expression is not after a '!' operator
-                    if (!afterNot) {
-                        sb.append(key);
-                        sb.append(' ');
+                    if (!$afterNot) {
+                        $sb .= $key;
+                        $sb .= ' ';
                     }
 
-                    sb.append(this.convertSimpleOperatorTokenToSqlString(firstToken));
-                    sb.append(" ?");
-                    args.add(this.extractUnquotedString(secondToken));
+                    $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
+                    $sb .= ' ?';
+                    $args[] = $this->extractUnquotedString($secondToken);
                 }
 
                 break;
@@ -216,35 +213,35 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
 
             break;
 
-        case FilterToken.GREATER_THAN:
-        case FilterToken.GREATER_THAN_OR_EQUAL:
-        case FilterToken.LESS_THAN:
-        case FilterToken.LESS_THAN_OR_EQUAL:
+        case FilterToken::GREATER_THAN:
+        case FilterToken::GREATER_THAN_OR_EQUAL:
+        case FilterToken::LESS_THAN:
+        case FilterToken::LESS_THAN_OR_EQUAL:
 
             // If their is not only 2 token then this is an error (this will not be the case when we'll have
             // support for parenthesis)
-            if (tokens.size() != 2) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            if (count($tokens) !== 2) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             // Its not possible to apply a '!' operator with the '>', '>=', '<' or '<=', in any cases its a non
             // sense
-            if (afterNot) {
+            if ($afterNot) {
                 throw new ConverterException("Using the '!' operator before the '"
-                        + this.convertSimpleOperatorTokenToSqlString(firstToken) + "' operator is forbidden !");
+                        . $this->convertSimpleOperatorTokenToSqlString($firstToken) . "' operator is forbidden !");
             }
 
             // Now parse the value
-            secondToken = tokens.get(1);
+            $secondToken = $tokens[1];
 
-            switch (secondToken.getTokenCode()) {
-            case FilterToken.NUMBER:
-                sb.append(key);
-                sb.append(" ");
-                sb.append(this.convertSimpleOperatorTokenToSqlString(firstToken));
-                sb.append(" ?");
+            switch ($secondToken->getTokenCode()) {
+            case FilterToken::NUMBER:
+                $sb .= $key;
+                $sb .= ' ';
+                $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
+                $sb .= ' ?';
 
-                args.add(this.parseNumberToken(secondToken));
+                $args[] = $this->parseNumberToken($secondToken);
 
                 break;
 
@@ -252,13 +249,13 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
             // exception très claire si la chaîne de caractères n'est pas dans un format ISO-8601.
             // Attention ici on a également un problème car les formats de date sont spécifiques à la
             // base de données utilisée.
-            case FilterToken.STRING:
-                sb.append(key);
-                sb.append(" ");
-                sb.append(this.convertSimpleOperatorTokenToSqlString(firstToken));
-                sb.append(" ?");
+            case FilterToken::STRING:
+                $sb .= $key;
+                $sb .= ' ';
+                $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
+                $sb .= ' ?';
 
-                args.add(this.extractUnquotedString(secondToken));
+                $args[] = $this->extractUnquotedString($secondToken);
 
                 break;
             default:
@@ -268,60 +265,60 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
             break;
 
         // The first token express a like
-        case FilterToken.LIKE:
+        case FilterToken::LIKE:
 
             // If their is not only 2 token then this is an error (this will not be the case when we'll have
             // support for parenthesis)
-            if (tokens.size() != 2) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            if (count($tokens) !== 2) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             // Now parse the value
-            secondToken = tokens.get(1);
+            $secondToken = $tokens[1];
 
-            switch (secondToken.getTokenCode()) {
+            switch ($secondToken->getTokenCode()) {
             case FilterToken.NUMBER:
-                sb.append("cast(");
-                sb.append(key);
-                sb.append(" as varchar(32)) like ?");
-                args.add("%" + secondToken.getSequence() + "%");
+                $sb .= 'cast(';
+                $sb .= $key;
+                $sb .= ' as varchar(32)) like ?';
+                $args[] = '%' + $secondToken->getSequence() . '%';
                 break;
-            case FilterToken.STRING:
+            case FilterToken::STRING:
 
                 // The '~' operator can be combined with a string having '*' symbols
-                ITokenizer starTokenizer = new StarTokenizer();
-                List<IToken> starTokens = starTokenizer.tokenize(this.extractUnquotedString(secondToken));
+                $starTokenizer = new StarTokenizer();
+                $starTokens = $starTokenizer->tokenize($this->extractUnquotedString($secondToken));
 
-                String likeString = "%";
-                sb.append(key);
-                sb.append(" like ?");
+                $likeString = '%';
+                $sb .= $key;
+                $sb .= ' like ?';
 
                 // The string contains '*' symbols
-                if (starTokens.size() > 1) {
-                    int i = 0;
+                if (count($starTokens) > 1) {
+                    $i = 0;
 
-                    for (IToken starToken : starTokens) {
-                        if ("*".equals(starToken.getSequence())) {
+                    foreach ($starTokens as $starToken) {
+                        if ('*' === $starToken->getSequence()) {
                             // If the star is not positionned as the first or last token (this is because
                             // the '~' operator already adds '%' at start and end of target string)
-                            if (i != 0 && i != starTokens.size() - 1) {
-                                likeString += "%";
+                            if ($i !== 0 && $i !== count($starTokens) - 1) {
+                                $likeString .= '%';
                             }
                         } else {
-                            likeString += starToken.getSequence();
+                            $likeString .= $starToken->getSequence();
                         }
 
-                        i++;
+                        $i++;
                     }
                 }
 
                 // The string does not contain '*' symbols
                 else {
-                    likeString += this.extractUnquotedString(secondToken);
+                    $likeString .= $this->extractUnquotedString($secondToken);
                 }
 
-                likeString += "%";
-                args.add(likeString);
+                $likeString .= '%';
+                $args[] = $likeString;
 
                 break;
             default:
@@ -331,163 +328,166 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
             break;
 
         // The first token is a '!' operator
-        case FilterToken.NOT:
+        case FilterToken::NOT:
 
-            secondToken = tokens.get(1);
-            sb.append(key);
+            $secondToken = $tokens[1];
+            $sb .= $key;
 
             // The end of string is not a number or a string
-            if (tokens.size() > 2) {
+            if (count($tokens) > 2) {
                 // Re-apply the same processing to the string after '!'
-                Map.Entry<String, List<? extends Serializable>> endOfFilterConverted = null;
+                $endOfFilterConverted = null;
 
                 // Manage the '!~' cases
-                if (secondToken.getTokenCode() == FilterToken.LIKE) {
+                if ($secondToken->getTokenCode() === FilterToken::LIKE) {
                     throw new ConverterException(
                             "Using the '!' operator before the '~' is currently not supported, please used the '!' "
-                                    + "operator with a string having '*' characters instead !");
+                                    . "operator with a string having '*' characters instead !");
                 }
 
                 // Else
                 else {
-                    endOfFilterConverted = this.parseFromFirstToken(key, value.substring(1),
+                    $endOfFilterConverted = $this->parseFromFirstToken($key, substr($value, 1),
                             tokens.subList(1, tokens.size()), true);
                 }
 
-                sb.append(" ");
+                $sb .= ' ';
 
                 // If the "sub-filter" is not a like expression
                 if (endOfFilterConverted.getKey().indexOf("not like ") == -1
                         && endOfFilterConverted.getKey().indexOf("not in") == -1) {
-                    sb.append("!");
+                    $sb .= '!';
                 }
 
-                sb.append(endOfFilterConverted.getKey());
+                $sb .= $endOfFilterConverted[0];
                 args.addAll(endOfFilterConverted.getValue());
             }
 
             // The end of string is a number or a string
             else if (tokens.size() == 2) {
-                sb.append(" = ");
+                $sb .= ' = ';
 
-                switch (secondToken.getTokenCode()) {
+                switch ($secondToken->getTokenCode()) {
                 case FilterToken.NUMBER:
-                    sb.append("!?");
-                    args.add(this.parseNumberToken(secondToken));
+                    $sb .= '!?';
+                    $args[] = $this->parseNumberToken($secondToken);
                     break;
                 case FilterToken.STRING:
-                    sb.append("!?");
-                    args.add(this.extractUnquotedString(secondToken));
+                    $sb .= '!?';
+                    $args[] = $this->extractUnquotedString($secondToken);
                     break;
                 default:
-                    throw new ConverterException("Invalid filter expression '" + value + "' !");
+                    throw new ConverterException("Invalid filter expression '" . $value . "' !");
                 }
 
             }
 
             // Otherwise we are on an invalid filter expression
             else {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             break;
 
         // The first token is an 'in' operator
-        case FilterToken.IN:
+        case FilterToken::IN:
 
             // If their is not at least 4 tokens then the 'in' expression is not well formed
-            if (tokens.size() < 4) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            if (count($tokens) < 4) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             // The second token must be an open bracket
-            secondToken = tokens.get(1);
-            if (secondToken.getTokenCode() != FilterToken.OPEN_BRAKET) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            $secondToken = $tokens[1];
+            if ($secondToken->getTokenCode() !== FilterToken::OPEN_BRAKET) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
             // If the 'in' expression is not after a '!' operator
-            if (!afterNot) {
-                sb.append(key);
-                sb.append(" ");
+            if (!$afterNot) {
+                $sb .= $key;
+                $sb .= ' ';
             } else {
-                sb.append("not ");
+                $sb .= 'not ';
             }
 
-            sb.append("in(");
+            $sb .= 'in(';
 
             // Loop through the list of values
-            boolean canEncounterComma = false;
-            int i = 2;
-            IToken currentToken = tokens.get(i);
+            $canEncounterComma = false;
+            $i = 2;
+            $currentToken = $tokens[i];
 
-            while (currentToken != null && currentToken.getTokenCode() != FilterToken.CLOSE_BRAKET) {
-                if (currentToken.getTokenCode() == FilterToken.CLOSE_BRAKET) {
+            while ($currentToken !== null && $currentToken->getTokenCode() !== FilterToken::CLOSE_BRAKET) {
+                if ($currentToken->getTokenCode() === FilterToken::CLOSE_BRAKET) {
                     break;
                 }
 
                 // If a ',' is expected and the current token is not a comma this is an error
-                if (canEncounterComma && currentToken.getTokenCode() != FilterToken.COMMA) {
-                    throw new ConverterException("Invalid filter expression '" + value + "' !");
+                if ($canEncounterComma && $currentToken->getTokenCode() != FilterToken.COMMA) {
+                    throw new ConverterException("Invalid filter expression '" . $value . "' !");
                 }
 
                 // If a ',' is expected and encountered
-                else if (canEncounterComma && currentToken.getTokenCode() == FilterToken.COMMA) {
-                    sb.append(",");
-                    ++i;
-                    try {
-                        currentToken = tokens.get(i);
-                        canEncounterComma = false;
-                        continue;
-                    } catch (IndexOutOfBoundsException ioobex) {
-                        throw new ConverterException("Invalid filter expression '" + value + "' !", ioobex);
+                else if ($canEncounterComma && $currentToken->getTokenCode() === FilterToken::COMMA) {
+                    $sb .= ',';
+                    ++$i;
+
+                    if(!array_key_exists(i, $tokens))
+                    {
+                        throw new ConverterException("Invalid filter expression '" . $value . "' !", $ioobex);
                     }
+
+                    $currentToken = $tokens[i];
+                    $canEncounterComma = false;
+                    continue;
                 }
 
                 // Otherwise
                 else {
-                    switch (currentToken.getTokenCode()) {
+                    switch ($currentToken->getTokenCode()) {
                     case FilterToken.NUMBER:
-                        sb.append("?");
-                        args.add(this.parseNumberToken(currentToken));
+                        $sb .= '?';
+                        $args [] = $this->parseNumberToken($currentToken);
                         break;
                     case FilterToken.STRING:
-                        sb.append("?");
-                        args.add(this.extractUnquotedString(currentToken));
+                        $sb .= '?';
+                        $args[] = $this->extractUnquotedString($currentToken);
                         break;
                     default:
-                        throw new ConverterException("Invalid filter expression '" + value + "' !");
+                        throw new ConverterException("Invalid filter expression '" . $value . "' !");
                     }
 
-                    ++i;
+                    ++$i;
 
-                    try {
-                        currentToken = tokens.get(i);
-                        canEncounterComma = true;
-                        continue;
-                    } catch (IndexOutOfBoundsException ioobex) {
-                        throw new ConverterException("Invalid filter expression '" + value + "' !", ioobex);
+                    if(!array_key_exists($i, $tokens))
+                    {
+                        throw new ConverterException("Invalid filter expression '" . $value . "' !", ioobex);
                     }
+
+                    $currentToken = $tokens[i];
+                    $canEncounterComma = true;
                 }
             }
 
-            sb.append(")");
+            $sb .= ')';
             break;
 
         // The first token is a string
-        case FilterToken.STRING:
-            throw new ConverterException("Invalid filter expression '" + value + "' !");
+        case FilterToken::STRING:
+            throw new ConverterException("Invalid filter expression '" . $value . "' !");
 
             // The first token is a number
-        case FilterToken.NUMBER:
+        case FilterToken::NUMBER:
 
             // If their is more than one tohen then this is an error
-            if (tokens.size() != 1) {
-                throw new ConverterException("Invalid filter expression '" + value + "' !");
+            if (count($tokens) !== 1) {
+                throw new ConverterException("Invalid filter expression '" . $value . "' !");
             }
 
-            sb.append(key + " = ?");
-            args.add(this.parseNumberToken(firstToken));
+            $sb .= $key;
+            $sb .= ' = ?';
+            $args[] = $this->parseNumberToken($firstToken);
 
             break;
 
@@ -496,29 +496,31 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
             break;
         }
 
-        return new AbstractMap.SimpleImmutableEntry<>(sb.toString(), args);
+        return [$sb, $args];
     }
 
     /**
-     * Utility method used to parse the value of a number token and return a Java {@link Integer} instance if the number
-     * is an integer and a Java {@link Double} instance if the number is a double.
+     * Utility method used to parse the value of a number token and return an integer instance if the number
+     * is an integer and a float instance if the number is a float.
      *
      * @param token the token to parse.
      *
-     * @return an {@link Integer} or a {@link Double} depending on the type of the parsed number.
+     * @return int | float an int or a float depending on the type of the parsed number.
      */
-    private Serializable parseNumberToken(final IToken token) {
-        Serializable parsed = null;
+    private function /* int | float */ parseNumberToken(/* TokenInterface */ $token) {
+        $parsed = null;
 
-        try {
-            // If successful the number is an integer
-            parsed = Integer.parseInt(token.getSequence());
-        } catch (NumberFormatException nfex) {
-            // If successful the number is a double
-            parsed = Double.parseDouble(token.getSequence());
+        // If the number is an integer
+        if(ctype_digit($token->getSequence())) {
+            $parsed = intval($token->getSequence());
         }
 
-        return parsed;
+        // If successful the number is a double
+        else {
+            $parsed = floatval($token->getSequence());
+        }
+
+        return $parsed;
     }
 
     /**
@@ -528,30 +530,30 @@ class SqlFilterConverter implements SqlFilterConverterInterface {
      * @param value the filter value.
      * @param context additional context variable to replace.
      *
-     * @return a key / value pair which maps the resulting SQL filter with its prepared statement parameters.
+     * @return array a key / value pair which maps the resulting SQL filter with its prepared statement parameters.
      */
-    private Map.Entry<String, List<? extends Serializable>> transformSimpleFilter(final String key, final String value,
-            final Map<String, Object> context) {
-        Map.Entry<String, List<? extends Serializable>> result = new AbstractMap.SimpleImmutableEntry<>("",
-                new ArrayList<Serializable>());
+    private function /* array */ transformSimpleFilter(
+        /* string */ $key, /* string */ $value, /* array */ $context
+    ) {
+        $result = ['', []];
 
         try {
             // Creates a tokenizer to tokenize the filter value
-            ITokenizer tokenizer = new FilterTokenizer();
+            $tokenizer = new FilterTokenizer();
 
             // Tokenize the filter
-            List<IToken> tokens = tokenizer.tokenize(value);
+            $tokens = $tokenizer->tokenize($value);
 
             // Now parse the tokens
-            if (!tokens.isEmpty()) {
-                result = this.parseFromFirstToken(key, value, tokens, false);
+            if (!empty($tokens)) {
+                $result = $this->parseFromFirstToken($key, $value, $tokens, false);
             }
 
-        } catch (TokenizerException tex) {
+        } catch (TokenizerException $tex) {
             // If an exception is encountered at tokenization then we consider the value to be a simple string
-            result = new AbstractMap.SimpleImmutableEntry<>(key + " = ?", Arrays.asList(value));
+            $result = [$key . ' = ?', [$value]];
         }
 
-        return result;
+        return $result;
     }
 }

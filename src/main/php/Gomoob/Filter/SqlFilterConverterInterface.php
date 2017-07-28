@@ -35,17 +35,6 @@ namespace Gomoob\Filter;
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
 interface SqlFilterConverterInterface {
-
-    /**
-     * Transforms a filter.
-     *
-     * @param mixed $key the key associated to the filter.
-     * @param string $value the value associated to the filter.
-     *
-     * @return array key / value pair which maps the resulting SQL filter with its prepared statement parameters.
-     */
-    public function transform($key, /* string */ $value) /* : array */;
-
     /**
      * Transforms a filter.
      *
@@ -55,5 +44,5 @@ interface SqlFilterConverterInterface {
      *
      * @return array key / value pair which maps the resulting SQL filter with its prepared statement parameters.
      */
-    public function transform($key, /* string */ $value, /* array */ $context) /* : array */;
+    public function transform($key, /* string */ $value, /* array */ $context = []) /* : array */;
 }
