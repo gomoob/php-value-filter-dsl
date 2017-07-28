@@ -43,7 +43,6 @@ use Gomoob\Filter\Tokenizer\StarTokenizer;
  */
 class SqlFilterConverter implements SqlFilterConverterInterface
 {
-
     /**
      * {@inheritDoc}
      */
@@ -59,7 +58,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
             throw new ConverterException('Complex filters are currently not implemented !');
         } // Otherwise this is an error
         else {
-            throw new ConverterException('Invalid filter key class !');
+            throw new ConverterException('Invalid filter key type !');
         }
 
         return $sqlFilterWithParams;

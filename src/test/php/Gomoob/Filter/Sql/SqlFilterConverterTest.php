@@ -78,6 +78,32 @@ class SqlFilterConverterTest extends TestCase
         $this->assertSame('property = ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('Sample string', $sqlFilter->getParams()[0]);
+
+        // Test with a complex filter and only one property (currently not supported so considered as string for now)
+        // Sample complex filters with only one property would be
+        //  "<10->2"                : Lower than 10 or greater than 2
+        //  "'Handball'-'Football'" : Equals to 'Hand ball' or 'Foot ball'
+        //  "'*ball*'+'*tennis*'"   : Like 'ball' and like 'tennis'
+        $sqlFilter = $this->filterConverter->transform('property', '<10->2');
+        $this->assertSame('property = ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('<10->2', $sqlFilter->getParams()[0]);
+
+        // Test with a complex filter with multiple properties (currently not supported and will fail)
+        try {
+            $this->filterConverter->transform(0, 'price:<90-validity:>=3');
+            $this->fail('Must have thrown a ConverterException !');
+        } catch (ConverterException $cex) {
+            $this->assertSame('Complex filters are currently not implemented !', $cex->getMessage());
+        }
+
+        // Test with a key which has a bad type
+        try {
+            $this->filterConverter->transform(0.26, '>10');
+            $this->fail('Must have thrown a ConverterException !');
+        } catch (ConverterException $cex) {
+            $this->assertSame('Invalid filter key type !', $cex->getMessage());
+        }
     }
 
     /**
