@@ -32,14 +32,16 @@ namespace Gomoob\Filter\Tokenizer;
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-class FilterTokenizer extends AbstractTokenizer {
+class FilterTokenizer extends AbstractTokenizer
+{
 
     /**
      * Creates a new instance of the filter tokenizer.
      *
      * @return \Gomoob\Filter\Tokenizer\FilterTokenizer the created instance.
      */
-    public function __construct() {
+    public function __construct()
+    {
 
         // This allows to clean our matched tokens a little
         $this->trim = true;
@@ -47,28 +49,28 @@ class FilterTokenizer extends AbstractTokenizer {
         // WARNING, ORDER IS VERY IMPORTANT
 
         // Parenthesis
-        $this->addTokenInfo('(\\()', FilterToken.OPEN_BRAKET);
-        $this->addTokenInfo('(\\))', FilterToken.CLOSE_BRAKET);
+        $this->addTokenInfo('(\()', FilterToken::OPEN_BRAKET);
+        $this->addTokenInfo('(\))', FilterToken::CLOSE_BRAKET);
 
         // Simple operators
-        $this->addTokenInfo('(>=)', FilterToken.GREATER_THAN_OR_EQUAL);
-        $this->addTokenInfo('(<=)', FilterToken.LESS_THAN_OR_EQUAL);
-        $this->addTokenInfo('(=)', FilterToken.EQUAL_TO);
-        $this->addTokenInfo('(>)', FilterToken.GREATER_THAN);
-        $this->addTokenInfo('(<)', FilterToken.LESS_THAN);
-        $this->addTokenInfo('(~)', FilterToken.LIKE);
+        $this->addTokenInfo('(>=)', FilterToken::GREATER_THAN_OR_EQUAL);
+        $this->addTokenInfo('(<=)', FilterToken::LESS_THAN_OR_EQUAL);
+        $this->addTokenInfo('(=)', FilterToken::EQUAL_TO);
+        $this->addTokenInfo('(>)', FilterToken::GREATER_THAN);
+        $this->addTokenInfo('(<)', FilterToken::LESS_THAN);
+        $this->addTokenInfo('(~)', FilterToken::LIKE);
 
         // No operator
-        $this->addTokenInfo('(!)', FilterToken.NOT);
+        $this->addTokenInfo('(!)', FilterToken::NOT);
 
         // Function operators
-        $this->addTokenInfo('(in)', FilterToken.IN);
+        $this->addTokenInfo('(in)', FilterToken::IN);
 
         // Separators
-        $this->addTokenInfo('(,)', FilterToken.COMMA);
+        $this->addTokenInfo('(,)', FilterToken::COMMA);
 
         // Values
-        $this->addTokenInfo('([0-9.]+)', FilterToken.NUMBER);
-        $this->addTokenInfo('\'([^\']+)\'', FilterToken.STRING);
+        $this->addTokenInfo('([0-9.]+)', FilterToken::NUMBER);
+        $this->addTokenInfo('(\'[^\']+\')', FilterToken::STRING);
     }
 }

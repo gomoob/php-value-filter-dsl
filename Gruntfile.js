@@ -60,7 +60,7 @@ module.exports = function(grunt) {
                     command : function() {
 
                         var command = 'php ./vendor/squizlabs/php_codesniffer/bin/phpcs';
-                        command += ' --cache'; 
+                        command += ' --cache';
                         command += ' --colors';
                         command += ' --filter=GitModified';
                         command += ' --parallel=16'; // Requires PHP to be compiled with PCNTL package
@@ -70,11 +70,11 @@ module.exports = function(grunt) {
                         if(grunt.option('checkstyle') === true) {
 
                             command += ' --report=checkstyle';
-                            command += ' --report-file=target/reports/phpcs/phpcs.xml'; 
+                            command += ' --report-file=target/reports/phpcs/phpcs.xml';
                         }
 
-                        // command += ' src/main/php';
-                        command += ' src/test/php/Gomoob/FacebookMessenger/Model/Message';
+                        command += ' src/main/php';
+                        command += ' src/test/php';
 
                         return command;
 
@@ -85,7 +85,7 @@ module.exports = function(grunt) {
                     command : function() {
 
                         var command = 'php ./vendor/squizlabs/php_codesniffer/bin/phpcbf';
-                        command += ' --cache'; 
+                        command += ' --cache';
                         command += ' --filter=GitModified';
                         command += ' --parallel=16'; // Requires PHP to be compiled with PCNTL package
                         command += ' --standard=PSR2';
@@ -139,7 +139,7 @@ module.exports = function(grunt) {
                         }
                     }
                 },
-                
+
                 phpunit : {
                     command: (function() {
 
@@ -169,7 +169,7 @@ module.exports = function(grunt) {
 
     ); /* Grunt initConfig call */
 
-    // Load the Grunt Plugins    
+    // Load the Grunt Plugins
     require('load-grunt-tasks')(grunt);
 
     /**
@@ -185,7 +185,7 @@ module.exports = function(grunt) {
             fs.mkdirSync('build/reports');
         }
 
-        if(!fs.existsSync('build/reports/pdepend')) {   
+        if(!fs.existsSync('build/reports/pdepend')) {
             fs.mkdirSync('build/reports/pdepend');
         }
 
@@ -206,7 +206,7 @@ module.exports = function(grunt) {
                 fs.mkdirSync('build/reports');
             }
 
-            if(!fs.existsSync('build/reports/phpcs')) {   
+            if(!fs.existsSync('build/reports/phpcs')) {
                 fs.mkdirSync('build/reports/phpcs');
             }
 
@@ -227,7 +227,7 @@ module.exports = function(grunt) {
             fs.mkdirSync('build/reports');
         }
 
-        if(!fs.existsSync('build/reports/phpmd')) {   
+        if(!fs.existsSync('build/reports/phpmd')) {
             fs.mkdirSync('build/reports/phpmd');
         }
 
@@ -265,7 +265,7 @@ module.exports = function(grunt) {
 
     /**
      * Default task, this task executes the following actions :
-     *  - Clean the previous build folder 
+     *  - Clean the previous build folder
      */
     grunt.registerTask('default', ['clean', 'test', 'generate-documentation']);
 
