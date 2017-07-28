@@ -28,7 +28,6 @@
 namespace Gomoob\Filter\Tokenizer;
 
 use Gomoob\Filter\TokenizerInterface;
-use Gomoob\Filter\TokenInfoInterface;
 
 /**
  * Abstract class common to all tokenizers.
@@ -56,11 +55,11 @@ abstract class AbstractTokenizer implements TokenizerInterface {
      * {@inheritDoc}
      */
     public function addTokenInfo(/* string */ $regex, /* int */ $tokenCode) {
-        // The user can pass a regular expression string and a token code to the method. The method will then the "^"
-        // character to the user supplied regular expression. It causes the regular expression to match only the
+        // The user can pass a regular expression string and a token code to the method. The method will then add the
+        // "^" character to the user supplied regular expression. It causes the regular expression to match only the
         // beginning of a string. This is needed because we will be removing any token always looking for the next token
         // at the beginning of the input string.
-        $this->tokenInfos->add(new TokenInfo('^' + $regex, tokenCode));
+        $this->tokenInfos[] = new TokenInfo('/^' . $regex . '/', $tokenCode);
     }
 
     /**
@@ -70,7 +69,7 @@ abstract class AbstractTokenizer implements TokenizerInterface {
         $tokens = [];
 
         // First we clean our string
-        $s = new String($string);
+        $s = $string;
 
         // Boolean variable used to indicate if a token is matched in the string to analyze, this is used to detect
         // unexpected tokens
@@ -79,15 +78,16 @@ abstract class AbstractTokenizer implements TokenizerInterface {
         // While their are tokens to extract / analyze
         while ($s !== '') {
             foreach ($this->tokenInfos as $info) {
-                Matcher matcher = info.getRegex().matcher(s);
+                $matches = [];
 
                 // If a known token has been encountered
-                if (matcher.find()) {
+                if (preg_match($info->getRegex(), $s, $matches)) {
+
                     // A token has been found
                     $match = true;
 
                     // The sequence of characters which forms the detected token
-                    $sequence = matcher.group();
+                    $sequence = $matches[1];
 
                     if ($this->trim) {
                         $sequence = trim($sequence);
@@ -101,14 +101,14 @@ abstract class AbstractTokenizer implements TokenizerInterface {
                     // Add our token to detected tokens
                     $tokens[] = $token;
 
-                    $s = matcher.replaceFirst("");
+                    $s = preg_replace($info->getRegex(), '', $s, 1);
                     break;
                 }
             }
 
             // The provided string is invalid
-            if (!$match) {
-                throw new TokenizerException("Unexpected character in input : " + $s);
+            if ($match === false) {
+                throw new TokenizerException('Unexpected character in input : ' . $s);
             }
 
             // Reinitialize match for next loop

@@ -27,276 +27,293 @@
  */
 namespace Gomoob\Filter\Tokenizer;
 
-class FilterTokenizerTest {
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Test case for the `\Gomoob\Filter\Tokenizer\FilterTokenizer` class.
+ *
+ * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
+ * @group FilterTokenizerTest
+ */
+class FilterTokenizerTest extends TestCase {
 
     /**
      * Test with a complex '!in' and '(' and ')' operators.
+     *
+     * @group FilterTokenizerTest.testTokenizeComplexNotIn
      */
-    @Test
-    public void testTokenizeComplexNotIn() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeComplexNotIn() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("!in(5,7,9)");
+        $tokens = $tokenizer->tokenize('!in(5,7,9)');
 
-        assertThat(tokens.size()).isEqualTo(9);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(3).getSequence()).isEqualTo("5");
-        assertThat(tokens.get(4).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(5).getSequence()).isEqualTo("7");
-        assertThat(tokens.get(6).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(7).getSequence()).isEqualTo("9");
-        assertThat(tokens.get(8).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(9);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(3).getSequence()).isEqualTo("5");
+        assertThat($tokens->get(4).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(5).getSequence()).isEqualTo("7");
+        assertThat($tokens->get(6).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(7).getSequence()).isEqualTo("9");
+        assertThat($tokens->get(8).getSequence()).isEqualTo(")");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("!in(5.23,2.96,1.47)");
+        $tokens = $tokenizer->tokenize("!in(5.23,2.96,1.47)");
 
-        assertThat(tokens.size()).isEqualTo(9);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(3).getSequence()).isEqualTo("5.23");
-        assertThat(tokens.get(4).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(5).getSequence()).isEqualTo("2.96");
-        assertThat(tokens.get(6).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(7).getSequence()).isEqualTo("1.47");
-        assertThat(tokens.get(8).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(9);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(3).getSequence()).isEqualTo("5.23");
+        assertThat($tokens->get(4).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(5).getSequence()).isEqualTo("2.96");
+        assertThat($tokens->get(6).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(7).getSequence()).isEqualTo("1.47");
+        assertThat($tokens->get(8).getSequence()).isEqualTo(")");
 
         // Test with a simple string
-        tokens = tokenizer.tokenize("!in('string1','string 2','string_3')");
+        $tokens = $tokenizer->tokenize("!in('string1','string 2','string_3')");
 
-        assertThat(tokens.size()).isEqualTo(9);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(3).getSequence()).isEqualTo("'string1'");
-        assertThat(tokens.get(4).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(5).getSequence()).isEqualTo("'string 2'");
-        assertThat(tokens.get(6).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(7).getSequence()).isEqualTo("'string_3'");
-        assertThat(tokens.get(8).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(9);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(3).getSequence()).isEqualTo("'string1'");
+        assertThat($tokens->get(4).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(5).getSequence()).isEqualTo("'string 2'");
+        assertThat($tokens->get(6).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(7).getSequence()).isEqualTo("'string_3'");
+        assertThat($tokens->get(8).getSequence()).isEqualTo(")");
     }
 
     /**
      * Test with a simple '=' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleEqual
      */
-    @Test
-    public void testTokenizeSimpleEqual() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleEqual() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("=5");
+        $tokens = $tokenizer->tokenize("=5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple integer and a star (this must always be quoted)
-        tokens = tokenizer.tokenize("='*5'");
+        $tokens = $tokenizer->tokenize("='*5'");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("'*5'");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("'*5'");
 
-        tokens = tokenizer.tokenize("='5*'");
+        $tokens = $tokenizer->tokenize("='5*'");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("'5*'");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("'5*'");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("=14.69");
+        $tokens = $tokenizer->tokenize("=14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
 
         // Test with a simple string and stars (this must always be quoted)
-        tokens = tokenizer.tokenize("='*word1 *word2*'");
+        $tokens = $tokenizer->tokenize("='*word1 *word2*'");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("'*word1 *word2*'");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("'*word1 *word2*'");
     }
 
     /**
      * Test with a simple 'in' and '(' and ')' operators.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleIn
      */
-    @Test
-    public void testTokenizeSimpleIn() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleIn() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("in(5,7,9)");
+        $tokens = $tokenizer->tokenize("in(5,7,9)");
 
-        assertThat(tokens.size()).isEqualTo(8);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("5");
-        assertThat(tokens.get(3).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(4).getSequence()).isEqualTo("7");
-        assertThat(tokens.get(5).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(6).getSequence()).isEqualTo("9");
-        assertThat(tokens.get(7).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(8);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("5");
+        assertThat($tokens->get(3).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(4).getSequence()).isEqualTo("7");
+        assertThat($tokens->get(5).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(6).getSequence()).isEqualTo("9");
+        assertThat($tokens->get(7).getSequence()).isEqualTo(")");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("in(5.23,2.96,1.47)");
+        $tokens = $tokenizer->tokenize("in(5.23,2.96,1.47)");
 
-        assertThat(tokens.size()).isEqualTo(8);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("5.23");
-        assertThat(tokens.get(3).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(4).getSequence()).isEqualTo("2.96");
-        assertThat(tokens.get(5).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(6).getSequence()).isEqualTo("1.47");
-        assertThat(tokens.get(7).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(8);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("5.23");
+        assertThat($tokens->get(3).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(4).getSequence()).isEqualTo("2.96");
+        assertThat($tokens->get(5).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(6).getSequence()).isEqualTo("1.47");
+        assertThat($tokens->get(7).getSequence()).isEqualTo(")");
 
         // Test with a simple string
-        tokens = tokenizer.tokenize("in('string1','string 2','string_3')");
+        $tokens = $tokenizer->tokenize("in('string1','string 2','string_3')");
 
-        assertThat(tokens.size()).isEqualTo(8);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("in");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("(");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("'string1'");
-        assertThat(tokens.get(3).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(4).getSequence()).isEqualTo("'string 2'");
-        assertThat(tokens.get(5).getSequence()).isEqualTo(",");
-        assertThat(tokens.get(6).getSequence()).isEqualTo("'string_3'");
-        assertThat(tokens.get(7).getSequence()).isEqualTo(")");
+        assertThat($tokens->size()).isEqualTo(8);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("in");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("(");
+        assertThat($tokens->get(2).getSequence()).isEqualTo("'string1'");
+        assertThat($tokens->get(3).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(4).getSequence()).isEqualTo("'string 2'");
+        assertThat($tokens->get(5).getSequence()).isEqualTo(",");
+        assertThat($tokens->get(6).getSequence()).isEqualTo("'string_3'");
+        assertThat($tokens->get(7).getSequence()).isEqualTo(")");
     }
 
     /**
      * Test with a simple '<=' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleLessThanOrEqual
      */
-    @Test
-    public void testTokenizeSimpleLessThanOrEqual() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleLessThanOrEqual() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("<=5");
+        $tokens = $tokenizer->tokenize("<=5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("<=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("<=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("<=14.69");
+        $tokens = $tokenizer->tokenize("<=14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("<=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("<=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
     }
 
     /**
      * Test with a simple '<' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleLess
      */
-    @Test
-    public void testTokenizeSimpleLess() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleLess() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("<5");
+        $tokens = $tokenizer->tokenize("<5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("<");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("<");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("<14.69");
+        $tokens = $tokenizer->tokenize("<14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("<");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("<");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
     }
 
     /**
      * Test with a simple '>' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleGreater
      */
-    @Test
-    public void testTokenizeSimpleGreater() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleGreater() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize(">5");
+        $tokens = $tokenizer->tokenize(">5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo(">");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo(">");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize(">14.69");
+        $tokens = $tokenizer->tokenize(">14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo(">");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo(">");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
     }
 
     /**
      * Test with a simple '>=' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleGreaterThanOrEqual
      */
-    @Test
-    public void testTokenizeSimpleGreaterThanOrEqual() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleGreaterThanOrEqual() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize(">=5");
+        $tokens = $tokenizer->tokenize(">=5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo(">=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo(">=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize(">=14.69");
+        $tokens = $tokenizer->tokenize(">=14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo(">=");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo(">=");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
     }
 
     /**
      * Test with a simple '~' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleLike
      */
-    @Test
-    public void testTokenizeSimpleLike() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleLike() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple string
-        List<IToken> tokens = tokenizer.tokenize("~'Nantes'");
+        $tokens = $tokenizer->tokenize("~'Nantes'");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("~");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("'Nantes'");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("~");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("'Nantes'");
     }
 
     /**
      * Test with a simple '!' operator.
+     *
+     * @group FilterTokenizerTest.testTokenizeSimpleNot
      */
-    @Test
-    public void testTokenizeSimpleNot() {
-        ITokenizer tokenizer = new FilterTokenizer();
+    public function testTokenizeSimpleNot() {
+        $tokenizer = new FilterTokenizer();
 
         // Test with a simple integer
-        List<IToken> tokens = tokenizer.tokenize("!5");
+        $tokens = $tokenizer->tokenize("!5");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("5");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("5");
 
         // Test with a simple float
-        tokens = tokenizer.tokenize("!14.69");
+        $tokens = $tokenizer->tokenize("!14.69");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("14.69");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("14.69");
 
         // Test with a simple string
-        tokens = tokenizer.tokenize("!'This is a test'");
+        $tokens = $tokenizer->tokenize("!'This is a test'");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("!");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("'This is a test'");
+        assertThat($tokens->size()).isEqualTo(2);
+        assertThat($tokens->get(0).getSequence()).isEqualTo("!");
+        assertThat($tokens->get(1).getSequence()).isEqualTo("'This is a test'");
     }
 }

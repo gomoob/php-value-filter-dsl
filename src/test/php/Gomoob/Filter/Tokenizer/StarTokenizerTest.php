@@ -27,57 +27,61 @@
  */
 namespace Gomoob\Filter\Tokenizer;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Test class for the {@link StarTokenizer} class.
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
+ * @group StarTokenizerTest
  */
-class StarTokenizerTest {
+class StarTokenizerTest extends TestCase {
 
     /**
      * Test method for {@link StarTokenizer#tokenize(String)}.
+     *
+     * @group StarTokenizerTest.testTokenize
      */
-    @Test
-    public void testTokenize()
+    public function testTokenize()
     {
-        ITokenizer tokenizer = new StarTokenizer();
+        $tokenizer = new StarTokenizer();
 
         // Test with a string without any stars
-        List<IToken> tokens = tokenizer.tokenize("this is a test string");
+        $tokens = $tokenizer->tokenize('this is a test string');
 
-        assertThat(tokens.size()).isEqualTo(1);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("this is a test string");
+        $this->assertCount(1, $tokens);
+        $this->assertSame('this is a test string', $tokens[0]->getSequence());
 
         // Test with a simple string having only one star at the begining
-        tokens = tokenizer.tokenize("*word");
+        $tokens = $tokenizer->tokenize('*word');
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("*");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("word");
+        $this->assertCount(2, $tokens);
+        $this->assertSame('*', $tokens[0]->getSequence());
+        $this->assertSame('word', $tokens[1]->getSequence());
 
         // Test with a simple string having only one star at the end
-        tokens = tokenizer.tokenize("word*");
+        $tokens = $tokenizer->tokenize("word*");
 
-        assertThat(tokens.size()).isEqualTo(2);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("word");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("*");
+        $this->assertCount(2, $tokens);
+        $this->assertSame('word', $tokens[0]->getSequence());
+        $this->assertSame('*', $tokens[1]->getSequence());
 
         // Test with a simple string having only one star at the middle
-        tokens = tokenizer.tokenize("word1*word2");
+        $tokens = $tokenizer->tokenize("word1*word2");
 
-        assertThat(tokens.size()).isEqualTo(3);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("word1");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("*");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("word2");
+        $this->assertCount(3, $tokens);
+        $this->assertSame('word1', $tokens[0]->getSequence());
+        $this->assertSame('*', $tokens[1]->getSequence());
+        $this->assertSame('word2', $tokens[2]->getSequence());
 
         // Test with a simple string having several stars
-        tokens = tokenizer.tokenize("*word1 *word2*");
+        $tokens = $tokenizer->tokenize("*word1 *word2*");
 
-        assertThat(tokens.size()).isEqualTo(5);
-        assertThat(tokens.get(0).getSequence()).isEqualTo("*");
-        assertThat(tokens.get(1).getSequence()).isEqualTo("word1 ");
-        assertThat(tokens.get(2).getSequence()).isEqualTo("*");
-        assertThat(tokens.get(3).getSequence()).isEqualTo("word2");
-        assertThat(tokens.get(4).getSequence()).isEqualTo("*");
+        $this->assertCount(5, $tokens);
+        $this->assertSame('*', $tokens[0]->getSequence());
+        $this->assertSame('word1 ', $tokens[1]->getSequence());
+        $this->assertSame('*', $tokens[2]->getSequence());
+        $this->assertSame('word2', $tokens[3]->getSequence());
+        $this->assertSame('*', $tokens[4]->getSequence());
     }
 }
