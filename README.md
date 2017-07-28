@@ -2,12 +2,12 @@
 
 > Powerful filter DSL PHP library for REST Web Services query / URL parameters or other filtering needs.
 
-[![Total Downloads](https://img.shields.io/packagist/dt/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
-[![Latest Stable Version](https://img.shields.io/packagist/v/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
-[![Build Status](https://img.shields.io/travis/gomoob/php-value-filter-dsl.svg?style=flat)](https://travis-ci.org/gomoob/php-value-filter-dsl)
-[![Coverage](https://img.shields.io/coveralls/gomoob/php-value-filter-dsl.svg?style=flat)](https://coveralls.io/r/gomoob/php-value-filter-dsl?branch=master)
-[![Code Climate](https://img.shields.io/codeclimate/github/gomoob/php-value-filter-dsl.svg?style=flat)](https://codeclimate.com/github/gomoob/php-value-filter-dsl)
-[![License](https://img.shields.io/packagist/l/gomoob/php-value-filter-dsl.svg?style=flat)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
+[![Total Downloads](https://img.shields.io/packagist/dt/gomoob/php-value-filter-dsl.svg?style=flat-square)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
+[![Latest Stable Version](https://img.shields.io/packagist/v/gomoob/php-value-filter-dsl.svg?style=flat-square)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
+[![Build Status](https://img.shields.io/travis/gomoob/php-value-filter-dsl.svg?style=fla-squaret)](https://travis-ci.org/gomoob/php-value-filter-dsl)
+[![Coverage](https://img.shields.io/coveralls/gomoob/php-value-filter-dsl.svg?style=flat-square)](https://coveralls.io/r/gomoob/php-value-filter-dsl?branch=master)
+[![Code Climate](https://img.shields.io/codeclimate/github/gomoob/php-value-filter-dsl.svg?style=flat-square)](https://codeclimate.com/github/gomoob/php-value-filter-dsl)
+[![License](https://img.shields.io/packagist/l/gomoob/php-value-filter-dsl.svg?style=flat-square)](https://packagist.org/packages/gomoob/php-value-filter-dsl)
 
 ## Sample with not in
 
