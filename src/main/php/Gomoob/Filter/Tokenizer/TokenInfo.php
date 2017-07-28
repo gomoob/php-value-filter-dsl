@@ -29,7 +29,8 @@ namespace Gomoob\Filter\Tokenizer;
 
 use Gomoob\Filter\TokenInfoInterface;
 
-class TokenInfo implements TokenInfoInterface {
+class TokenInfo implements TokenInfoInterface
+{
 
     /**
      * The regular expression that is used to match the input string against the token.
@@ -55,7 +56,8 @@ class TokenInfo implements TokenInfoInterface {
      *
      * @return \Gomoob\Filter\Tokenizer\TokenInfo the created instance.
      */
-    public function __construct(/* string */ $regex, /* int */ $tokenCode) /* TokenInfo */ {
+    public function __construct(/* string */ $regex, /* int */ $tokenCode) /* TokenInfo */
+    {
         $this->regex = $regex;
         $this->tokenCode = $tokenCode;
     }
@@ -63,28 +65,16 @@ class TokenInfo implements TokenInfoInterface {
     /**
      * {@inheritDoc}
      */
-    public function getRegex() /* : string */ {
+    public function getRegex() /* : string */
+    {
         return $this->regex;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getTokenCode() /* : int */ {
+    public function getTokenCode() /* : int */
+    {
         return $this->tokenCode;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setRegex(/* string */ $regex) {
-        $this->regex = $regex;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setTokenCode(/* int */ $tokenCode) {
-        $this->tokenCode = $tokenCode;
     }
 }

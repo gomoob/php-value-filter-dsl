@@ -28,23 +28,24 @@
 namespace Gomoob\Filter;
 
 /**
- * Interface which represents an SQL filter converter. An SQL filter converter converts Gomoob query filters into SQL,
- * this filter returns parameterized SQL strings and associated parameters (this is VERY IMPORTANT to prevent SQL
- * injections).
+ * Interface which represents an SQL filter to be used to create an SQL query.
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-interface SqlFilterConverterInterface
+interface SqlFilterInterface
 {
     /**
-     * Transforms a filter.
+     * Gets the SQL filter expression to concat with an SQL query.
      *
-     * @param mixed $key the key associated to the filter.
-     * @param string $value the value associated to the filter.
-     * @param context additional convert variable to be replaced in the target filter to generate.
-     *
-     * @return \Gomoob\Filter\SqlFilterInterface key / value pair which maps the resulting SQL filter with its prepared
-     *         statement parameters.
+     * @return string the SQL filter expression to concat.
      */
-    public function transform($key, /* string */ $value, /* array */ $context = []) /* : SqlFilterInterface */;
+    public function getExpression() /* : string */;
+
+    /**
+     * Gets the SQL prepared statement parameters to add, this array has one parameter for each `?` characters inside
+     * the filter expression.
+     *
+     * @return array the SQL prepared statement parameters to add.
+     */
+    public function getParams();
 }

@@ -25,26 +25,58 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Gomoob\Filter;
+namespace Gomoob\Filter\Sql;
+
+use Gomoob\Filter\SqlFilterInterface;
 
 /**
- * Interface which represents an SQL filter converter. An SQL filter converter converts Gomoob query filters into SQL,
- * this filter returns parameterized SQL strings and associated parameters (this is VERY IMPORTANT to prevent SQL
- * injections).
+ * Class which represents an SQL filter to be used to create an SQL query.
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-interface SqlFilterConverterInterface
+class SqlFilter implements SqlFilterInterface
 {
     /**
-     * Transforms a filter.
+     * The SQL filter expression to concat with an SQL query.
      *
-     * @param mixed $key the key associated to the filter.
-     * @param string $value the value associated to the filter.
-     * @param context additional convert variable to be replaced in the target filter to generate.
-     *
-     * @return \Gomoob\Filter\SqlFilterInterface key / value pair which maps the resulting SQL filter with its prepared
-     *         statement parameters.
+     * @var string
      */
-    public function transform($key, /* string */ $value, /* array */ $context = []) /* : SqlFilterInterface */;
+    private $expression;
+
+    /**
+     * The SQL prepared statement parameters to add, this array has one parameter for each `?` characters inside the
+     * filter expression.
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
+     * Creates a new instance of the `SqlFilter` class.
+     *
+     * @param string $expression the SQL filter expression to concat with an SQL query.
+     * @param array $params the SQL prepared statement parameters to add, this array has one parameter for each `?`
+     *        characters inside the filter expression.
+     */
+    public function __construct(/* string */ $expression, /* array */ $params)
+    {
+        $this->expression = $expression;
+        $this->params = $params;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getExpression()
+    {
+        return $this->expression;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
 }

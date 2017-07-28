@@ -38,18 +38,18 @@ $urlParameterValue = "!in('Jack','Joe','Willian','Averell')";
 
 // Parsing the filter expression
 $filterConverter = new SqlFilterConverter();
-$sqlFilterExpressionAndParameters = $this->filterConverter->transform($urlParameterName, $urlParameterValue);
+$sqlFilter = $this->filterConverter->transform($urlParameterName, $urlParameterValue);
 
 // Use the parsed result to build our SQL query
-$preparedStatement = $pdo->prepare('select * from users where ' . $sqlFilterExpressionAndParameters[0]);
+$preparedStatement = $pdo->prepare('select * from users where ' . $sqlFilter->getExpression());
 
 $i = 1;
-foreach($sqlExpressionAndParameter[1] as $paramValue) {
-    $preparedStatement->bindParam($i++, paramValue);
+foreach($sqlFilter->getParams() as $param) {
+    $preparedStatement->bindParam($i++, $param);
 }
 
 // Executes our query
-$pdo->execute();
+$preparedStatement->execute();
 ```
 
 The previous sample will execute the SQL query `select * from users where first_name not in('?','?','?','?')` with the

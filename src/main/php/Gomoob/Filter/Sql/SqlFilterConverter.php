@@ -25,9 +25,11 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Gomoob\Filter\Converter;
+namespace Gomoob\Filter\Sql;
 
 use Gomoob\Filter\SqlFilterConverterInterface;
+
+use Gomoob\Filter\Converter\ConverterException;
 
 use Gomoob\Filter\Tokenizer\FilterToken;
 use Gomoob\Filter\Tokenizer\FilterTokenizer;
@@ -536,6 +538,6 @@ class SqlFilterConverter implements SqlFilterConverterInterface
             $result = [$key . ' = ?', [$value]];
         }
 
-        return $result;
+        return new SqlFilter($result[0], $result[1]);
     }
 }

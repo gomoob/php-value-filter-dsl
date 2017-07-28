@@ -32,7 +32,8 @@ namespace Gomoob\Filter;
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-interface TokenInfoInterface {
+interface TokenInfoInterface
+{
 
     /**
      * Gets the regular expression that is used to match the input string against the token.
@@ -49,20 +50,4 @@ interface TokenInfoInterface {
      * @return int the technical code of the token.
      */
     public function getTokenCode() /* : int */;
-
-    /**
-     * Sets the regular expression that is used to match the input string against the token.
-     *
-     * @param string regex the regular expression that is used to match the input string against the token.
-     */
-    public function setRegex(/* string */ $regex);
-
-    /**
-     * Sets the technical code of the token.
-     *
-     * Please note that in the whole grammar each kind of token should have its technical code.
-     *
-     * @param int $tokenCode the technical code of the token.
-     */
-    public function setTokenCode(/* int */ $tokenCode);
 }
