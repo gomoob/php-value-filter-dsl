@@ -60,7 +60,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransform()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', '10');
         $this->assertSame('property = ?', $res[0]);
@@ -87,7 +86,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformEqualTo()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', '=10');
         $this->assertSame('property = ?', $res[0]);
@@ -120,7 +118,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformGreaterThan()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', ">10");
         $this->assertSame('property > ?', $res[0]);
@@ -147,7 +144,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformGreaterThanOrEqual()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', ">=10");
         $this->assertSame('property >= ?', $res[0]);
@@ -174,7 +170,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformLessThan()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "<10");
         $this->assertSame('property < ?', $res[0]);
@@ -201,7 +196,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformLessThanOrEqual()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "<=10");
         $this->assertSame('property <= ?', $res[0]);
@@ -228,7 +222,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformIn()
     {
-
         // Test with an in and only integers
         $res = $this->filterConverter->transform('property', "in(5,12,3)");
         $this->assertSame('property in(?,?,?)', $res[0]);
@@ -261,7 +254,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformLike()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "~10");
         $this->assertSame('cast(property as varchar(32)) like ?', $res[0]);
@@ -300,7 +292,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNot()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', "!10");
         $this->assertSame('property = !?', $res[0]);
@@ -327,7 +318,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotEqualTo()
     {
-
         // Test with a simple integer
         $res = $this->filterConverter->transform('property', '!=10');
         $this->assertSame('property != ?', $res[0]);
@@ -360,7 +350,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotGreaterThan()
     {
-
         try {
             $this->filterConverter->transform('property', "!>10");
         } catch (ConverterException $cex) {
@@ -375,7 +364,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotGreaterThanOrEqual()
     {
-
         try {
             $this->filterConverter->transform('property', "!>=10");
         } catch (ConverterException $cex) {
@@ -390,7 +378,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotLessThan()
     {
-
         try {
             $this->filterConverter->transform('property', "!<10");
         } catch (ConverterException $cex) {
@@ -405,7 +392,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotLessThanOrEqual()
     {
-
         try {
             $this->filterConverter->transform('property', "!<=10");
         } catch (ConverterException $cex) {
@@ -420,7 +406,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotIn()
     {
-
         // Test with an in and only integers
         $res = $this->filterConverter->transform('property', "!in(5,12,3)");
         $this->assertSame('property not in(?,?,?)', $res[0]);
@@ -453,7 +438,6 @@ class SqlFilterConverterTest extends TestCase
      */
     public function testTransformNotLike()
     {
-
         try {
             $this->filterConverter->transform('property', "!~10");
         } catch (ConverterException $cex) {
