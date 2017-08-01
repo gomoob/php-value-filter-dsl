@@ -1,6 +1,5 @@
 {
   "name": "php-value-filter-dsl",
-  "version": "1.0.0-alpha1",
   "license": "MIT",
   "repository": {
     "type": "git",

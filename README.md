@@ -11,7 +11,7 @@
 
 ## Sample with not in
 
-Suppose you have a Web Service accessible using `https://api.myserver.com/users` and you want to create a filter to find
+Suppose you have a Web Service accessible using `https://api.myserver.com/users` and want to create a filter to find
 users not having a first name equals to `Jack`, `Joe`, `Willian` or `Averell`.
 
 To do this you'll have to request your relationnal database with a `not in` SQL request. The `php-value-filter-dsl`
@@ -43,6 +43,7 @@ $sqlFilter = $this->filterConverter->transform($urlParameterName, $urlParameterV
 // Use the parsed result to build our SQL query
 $preparedStatement = $pdo->prepare('select * from users where ' . $sqlFilter->getExpression());
 
+// Bind our prepared statement parameters
 $i = 1;
 foreach($sqlFilter->getParams() as $param) {
     $preparedStatement->bindParam($i++, $param);
@@ -57,12 +58,58 @@ prepared statement parameters `Jack`, `Joe`, `Willian`, `Averell`.
 
 Very simple and useful, isn't it ?
 
-Please note that for now we only provide convertion of our filters into SQL, but will extend the library to provide
-additional converters to transform the filters into other formats.
+Please note that for now we only provide convertion of filter expressions in SQL. Later we'll extend the library to
+provide additional converters to transform the filters into other formats.
 
 ## Documentation
 
-In progress.
+### Standard operators
+
+The expression language provides the following operators.
+
+| Operator | ASCII value | Name                     | Value type(s)                          |
+|----------|-------------|--------------------------|----------------------------------------|
+| `=`      | `%3D%       | Equals                   | Integer, Float, String                 |
+| `<`      | `%3C`       | Less than                | Integer, Float                         |
+| `<=`     | `%3C%3D`    | Less than or equal to    | Integer, Float                         |
+| `>`      | `%3E`       | Greater than             | Integer, Float                         |
+| `>=`     | `%3E%3D`    | Greater than or equal to | Integer, Float                         |
+| `in`     |             | In                       | Integer list, Double list, String list |
+| `~`      | `%7E%`      | Like                     | String                                 |
+| `!`      |             | Not                      | _see description above_                |
+
+### Not operator
+
+The `!` operator is special, it can be used directly before a value string or in combination with the `=` or `in`
+operators.
+
+For exemple `!5` or `!=5` to express "no equals to 5" or `!in('Paris','London')` ro express "no equals to Paris or
+London".
+
+### Like operator
+
+The `~` operator allows to create like SQL requests, but it is always converted to expressions equals to
+`my_property like ?` with a value equals to `%word%` which is not always wanted.
+
+To express more complex like expressions you can use the `*` string operator in the value associated to the `=` or `~`
+operators.
+
+For example `property=~'*Nantes*France*'` or `property='Nantes*France*'` will be translated to `property like ?` with
+a parameter equals to `%Nantes%France%`.
+
+### Values
+
+The following values can be used.
+
+* `null`
+* `true`, converted to the string "true" if the associated property is a string, to 1 if the property is an integer and
+   to 1.0 if the property is a double
+* `false`, converted to the string "false" if the associated property is a string, to 0 if the property is an integer
+   and to 0.0 if the property is a double
+* integer
+* floting number
+* string (must be quoted with simple quotes ')
+* string with an ISO 8601 format for the dates
 
 ## About Gomoob
 
