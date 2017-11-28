@@ -79,37 +79,65 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('Sample string', $sqlFilter->getParams()[0]);
 
-        // Test with a complex filter and only one property
-        // Sample complex filters with only one property would be
-        //  "<10+>2"                : Lower than 10 and greater than 2
-        //  "'Handball'-'Football'" : Equals to 'Hand ball' or 'Foot ball'
-        //  "'*ball*'+'*tennis*'"   : Like 'ball' and like 'tennis'
-        $sqlFilter = $this->filterConverter->transform('property', '<10+>2');
-        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
-        $this->assertCount(2, $sqlFilter->getParams());
-        $this->assertSame(10, $sqlFilter->getParams()[0]);
-        $this->assertSame(2, $sqlFilter->getParams()[1]);
-
-        $sqlFilter = $this->filterConverter->transform('property', '>10-<2');
-        $this->assertSame('(property > ? OR property < ?)', $sqlFilter->getExpression());
-        $this->assertCount(2, $sqlFilter->getParams());
-        $this->assertSame(10, $sqlFilter->getParams()[0]);
-        $this->assertSame(2, $sqlFilter->getParams()[1]);
-
-        // Test with a complex filter with multiple properties (currently not supported and will fail)
-        try {
-            $this->filterConverter->transform(0, 'price:<90-validity:>=3');
-            $this->fail('Must have thrown a ConverterException !');
-        } catch (ConverterException $cex) {
-            $this->assertSame('Complex filters are currently not implemented !', $cex->getMessage());
-        }
-
         // Test with a key which has a bad type
         try {
             $this->filterConverter->transform(0.26, '>10');
             $this->fail('Must have thrown a ConverterException !');
         } catch (ConverterException $cex) {
             $this->assertSame('Invalid filter key type !', $cex->getMessage());
+        }
+    }
+
+
+    /**
+     * Test method for {@link SqlFilterConverter#transform(Object, String)}.
+     *
+     * @group SqlFilterConverterTest.testTransformAnd
+     */
+    public function testTransformAnd()
+    {
+        // Test with integers
+        $sqlFilter = $this->filterConverter->transform('property', '<10+>2');
+        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(10, $sqlFilter->getParams()[0]);
+        $this->assertSame(2, $sqlFilter->getParams()[1]);
+
+        // Test with floats
+        $sqlFilter = $this->filterConverter->transform('property', '<5.3+>3.4');
+        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(5.3, $sqlFilter->getParams()[0]);
+        $this->assertSame(3.4, $sqlFilter->getParams()[1]);
+
+        // Test with strings
+        $sqlFilter = $this->filterConverter->transform('property', "Handball+Football");
+        $this->assertSame('property = ? AND property = ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('Handball', $sqlFilter->getParams()[0]);
+        $this->assertSame('Football', $sqlFilter->getParams()[1]);
+
+        // Test with strings and the like operator
+        $sqlFilter = $this->filterConverter->transform('property', "~'*ball*'+~'*tennis*'");
+        $this->assertSame('property like ? AND property like ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('%ball%', $sqlFilter->getParams()[0]);
+        $this->assertSame('%tennis%', $sqlFilter->getParams()[1]);
+    }
+
+    /**
+     * Test method for {@link SqlFilterConverter#transform(Object, String)}.
+     *
+     * @group SqlFilterConverterTest.testTransformComplex
+     */
+    public function testTransformComplex()
+    {
+        // Test with a complex filter with multiple properties (currently not supported and will fail)
+        try {
+            $this->filterConverter->transform(0, 'price:<90-validity:>=3');
+            $this->fail('Must have thrown a ConverterException !');
+        } catch (ConverterException $cex) {
+            $this->assertSame('Complex filters are currently not implemented !', $cex->getMessage());
         }
     }
 
@@ -496,5 +524,41 @@ class SqlFilterConverterTest extends TestCase
                 $cex->getMessage()
             );
         }
+    }
+
+    /**
+     * Test method for {@link SqlFilterConverter#transform(Object, String)}.
+     *
+     * @group SqlFilterConverterTest.testTransformOr
+     */
+    public function testTransformOr()
+    {
+        // Test with integers
+        $sqlFilter = $this->filterConverter->transform('property', '<10->2');
+        $this->assertSame('property < ? OR property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(10, $sqlFilter->getParams()[0]);
+        $this->assertSame(2, $sqlFilter->getParams()[1]);
+
+        // Test with floats
+        $sqlFilter = $this->filterConverter->transform('property', '<5.3->3.4');
+        $this->assertSame('property < ? OR property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(5.3, $sqlFilter->getParams()[0]);
+        $this->assertSame(3.4, $sqlFilter->getParams()[1]);
+
+        // Test with strings
+        $sqlFilter = $this->filterConverter->transform('property', "Handball-Football");
+        $this->assertSame('property = ? OR property = ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('Handball', $sqlFilter->getParams()[0]);
+        $this->assertSame('Football', $sqlFilter->getParams()[1]);
+
+        // Test with strings and the like operator
+        $sqlFilter = $this->filterConverter->transform('property', "~'*ball*'-~'*tennis*'");
+        $this->assertSame('property like ? OR property like ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('%ball%', $sqlFilter->getParams()[0]);
+        $this->assertSame('%tennis%', $sqlFilter->getParams()[1]);
     }
 }

@@ -34,7 +34,6 @@ namespace Gomoob\Filter\Tokenizer;
  */
 class LogicOperatorTokenizer extends AbstractTokenizer
 {
-
     /**
      * Creates a new instance of the logic operator tokenizer.
      *
@@ -42,7 +41,6 @@ class LogicOperatorTokenizer extends AbstractTokenizer
      */
     public function __construct()
     {
-
         // This allows to clean our matched tokens a little
         $this->trim = true;
 
@@ -52,9 +50,16 @@ class LogicOperatorTokenizer extends AbstractTokenizer
         $this->addTokenInfo('(\+)', LogicOperatorToken::AND);
         $this->addTokenInfo('(-)', LogicOperatorToken::OR);
 
-        // Values
+        // "Raw" values
         $this->addTokenInfo('([0-9.]+)', LogicOperatorToken::NUMBER);
         $this->addTokenInfo('(\'[^\']+\')', LogicOperatorToken::STRING);
+
+        // Values prefixed with Simple operators
+        $this->addTokenInfo('(~\'[^\']+\')', LogicOperatorToken::STRING);
+
+        // Values prefixed with Not operator
+        $this->addTokenInfo('(!\'[^\']+\')', LogicOperatorToken::STRING);
+
         $this->addTokenInfo('([^\'\+-]+)', LogicOperatorToken::STRING);
     }
 }

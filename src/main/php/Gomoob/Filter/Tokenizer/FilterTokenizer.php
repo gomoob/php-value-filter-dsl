@@ -60,7 +60,7 @@ class FilterTokenizer extends AbstractTokenizer
         $this->addTokenInfo('(<)', FilterToken::LESS_THAN);
         $this->addTokenInfo('(~)', FilterToken::LIKE);
 
-        // No operator
+        // Not operator
         $this->addTokenInfo('(!)', FilterToken::NOT);
 
         // Function operators

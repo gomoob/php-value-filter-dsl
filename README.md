@@ -85,12 +85,18 @@ The expression language provides the following operators.
 The `!` operator is special, it can be used directly before a value string or in combination with the `=` or `in`
 operators.
 
-For exemple `!5` or `!=5` to express "no equals to 5" or `!in('Paris','London')` ro express "no equals to Paris or
+For exemple `!5` or `!=5` to express "not equals to 5" or `!in('Paris','London')` to express "not equals to Paris or
 London".
 
-### And or operators
+### AND and OR operators
 
-The `+` and `-` operator allow to create AND and OR SQL requests. 
+The `+` and `-` operator allow to create AND and OR SQL requests.
+
+Here are sample expressions with logical operators.
+
+* `property=>5.4+<12` is translated to `property >= ? AND property < ?` with 2 parameters `[5.4,12]` ;
+* `property=~'*ball*'-~'*tennis*'` is translated to `property like ? OR property like ?` with 2 parameters 
+  `['%ball%','%tennis%'].
 
 ### Like operator
 

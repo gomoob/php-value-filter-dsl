@@ -530,19 +530,31 @@ class SqlFilterConverter implements SqlFilterConverterInterface
             // Tokenize the filter
             $tokens = $tokenizer->tokenize($value);
 
-            if (count($tokens) === 3 && ($tokens[1]->getTokenCode() === LogicOperatorToken::AND ||
-                $tokens[1]->getTokenCode() === LogicOperatorToken::OR)) {
-                $resultFirstPart = $this->transformSimpleFilter($key, $tokens[0]->getSequence(), $context);
-                $resultSecondPart = $this->transformSimpleFilter($key, $tokens[2]->getSequence(), $context);
+            // If a logical expression is expressed
+            if (count($tokens) === 3 &&
+                ($tokens[1]->getTokenCode() === LogicOperatorToken::AND ||
+                 $tokens[1]->getTokenCode() === LogicOperatorToken::OR)) {
+                // Transform the first part of the logical expression
+                $sqlFilter1 = $this->transformSimpleFilter($key, $tokens[0]->getSequence(), $context);
+
+                // Transform the second part of the logical expression
+                $sqlFilter2 = $this->transformSimpleFilter($key, $tokens[2]->getSequence(), $context);
+
+                // Creates the resulting SQL logical expression
+                $result[0] = $sqlFilter1->getExpression();
 
                 if ($tokens[1]->getTokenCode() === LogicOperatorToken::AND) {
-                    $result[0] = "$resultFirstPart[0] AND $resultSecondPart[0]";
+                    $result[0] .= ' AND ';
                 } elseif ($tokens[1]->getTokenCode() === LogicOperatorToken::OR) {
-                    $result[0] = "($resultFirstPart[0] OR $resultSecondPart[0])";
+                    $result[0] .= ' OR ';
                 }
-                $result[1] = array_merge($resultFirstPart[1], $resultSecondPart[1]);
+
+                $result[0] .= $sqlFilter2->getExpression();
+
+                // Creates the SQL parameters array
+                $result[1] = array_merge($sqlFilter1->getParams(), $sqlFilter2->getParams());
             } else {
-                $result = $this->transformSimpleFilter($key, $value, $context);
+                return $this->transformSimpleFilter($key, $value, $context);
             }
         } catch (TokenizerException $tex) {
             // If an exception is encountered at tokenization then we consider the value to be a simple string
@@ -568,17 +580,22 @@ class SqlFilterConverter implements SqlFilterConverterInterface
     ) /* : array */ {
         $result = ['', []];
 
-        // Creates a tokenizer to tokenize the filter value
-        $tokenizer = new FilterTokenizer();
+        try {
+            // Creates a tokenizer to tokenize the filter value
+            $tokenizer = new FilterTokenizer();
 
-        // Tokenize the filter
-        $tokens = $tokenizer->tokenize($value);
+            // Tokenize the filter
+            $tokens = $tokenizer->tokenize($value);
 
-        // Now parse the tokens
-        if (!empty($tokens)) {
-            $result = $this->parseFromFirstToken($key, $value, $tokens, false);
+            // Now parse the tokens
+            if (!empty($tokens)) {
+                $result = $this->parseFromFirstToken($key, $value, $tokens, false);
+            }
+        } catch (TokenizerException $tex) {
+            // If an exception is encountered at tokenization then we consider the value to be a simple string
+            $result = [$key . ' = ?', [$value]];
         }
 
-        return $result;
+        return new SqlFilter($result[0], $result[1]);
     }
 }

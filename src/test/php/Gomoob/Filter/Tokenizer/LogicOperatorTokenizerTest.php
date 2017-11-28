@@ -37,7 +37,6 @@ use PHPUnit\Framework\TestCase;
  */
 class LogicOperatorTokenizerTest extends TestCase
 {
-
     /**
      * An instance of the logic operator tokenizer to test.
      *
@@ -56,12 +55,11 @@ class LogicOperatorTokenizerTest extends TestCase
     /**
      * Test with a complex '+' and '-' operators.
      *
-     * @group LogicOperatorTokenizerTest.testTokenizeComplexAndOr
+     * @group LogicOperatorTokenizerTest.testTokenize
      */
-    public function testTokenizeComplexAndOr()
+    public function testTokenize()
     {
-
-        // Test with a simple integer '+'
+        // Test with 2 integers and '+'
         $tokens = $this->tokenizer->tokenize('>=10+<50');
 
         $this->assertCount(3, $tokens);
@@ -69,13 +67,37 @@ class LogicOperatorTokenizerTest extends TestCase
         $this->assertSame('+', $tokens[1]->getSequence());
         $this->assertSame('<50', $tokens[2]->getSequence());
 
-        // Test with a simple float '-'
+        // Test with 2 floats and '-'
         $tokens = $this->tokenizer->tokenize('>=10.1-<50.2');
 
         $this->assertCount(3, $tokens);
         $this->assertSame('>=10.1', $tokens[0]->getSequence());
         $this->assertSame('-', $tokens[1]->getSequence());
         $this->assertSame('<50.2', $tokens[2]->getSequence());
+
+        // Test with 2 not quoted strings and '+'
+        $tokens = $this->tokenizer->tokenize("Hand+Ball");
+
+        $this->assertCount(3, $tokens);
+        $this->assertSame('Hand', $tokens[0]->getSequence());
+        $this->assertSame('+', $tokens[1]->getSequence());
+        $this->assertSame('Ball', $tokens[2]->getSequence());
+
+        // Test with 2 quoted strings and '+'
+        $tokens = $this->tokenizer->tokenize("'Hand'+'Ball'");
+
+        $this->assertCount(3, $tokens);
+        $this->assertSame("'Hand'", $tokens[0]->getSequence());
+        $this->assertSame('+', $tokens[1]->getSequence());
+        $this->assertSame("'Ball'", $tokens[2]->getSequence());
+
+        // Test 2 strings prefixed with the like operator and '+'
+        $tokens = $this->tokenizer->tokenize("~'*ball*'+~'*tennis*'");
+
+        $this->assertCount(3, $tokens);
+        $this->assertSame("~'*ball*'", $tokens[0]->getSequence());
+        $this->assertSame('+', $tokens[1]->getSequence());
+        $this->assertSame("~'*tennis*'", $tokens[2]->getSequence());
 
         // Test with complex '+' '-'
         $tokens = $this->tokenizer->tokenize('>=10.1+<50.2-=60.3');
