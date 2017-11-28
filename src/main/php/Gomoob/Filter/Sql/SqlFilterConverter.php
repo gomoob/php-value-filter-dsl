@@ -536,9 +536,9 @@ class SqlFilterConverter implements SqlFilterConverterInterface
                 $resultSecondPart = $this->transformSimpleFilter($key, $tokens[2]->getSequence(), $context);
 
                 if ($tokens[1]->getTokenCode() === LogicOperatorToken::AND) {
-                    $result[0] = "$resultFirstPart[0] and $resultSecondPart[0]";
+                    $result[0] = "$resultFirstPart[0] AND $resultSecondPart[0]";
                 } elseif ($tokens[1]->getTokenCode() === LogicOperatorToken::OR) {
-                    $result[0] = "($resultFirstPart[0] or $resultSecondPart[0])";
+                    $result[0] = "($resultFirstPart[0] OR $resultSecondPart[0])";
                 }
                 $result[1] = array_merge($resultFirstPart[1], $resultSecondPart[1]);
             } else {

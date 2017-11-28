@@ -85,13 +85,13 @@ class SqlFilterConverterTest extends TestCase
         //  "'Handball'-'Football'" : Equals to 'Hand ball' or 'Foot ball'
         //  "'*ball*'+'*tennis*'"   : Like 'ball' and like 'tennis'
         $sqlFilter = $this->filterConverter->transform('property', '<10+>2');
-        $this->assertSame('property < ? and property > ?', $sqlFilter->getExpression());
+        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
         $this->assertCount(2, $sqlFilter->getParams());
         $this->assertSame(10, $sqlFilter->getParams()[0]);
         $this->assertSame(2, $sqlFilter->getParams()[1]);
 
         $sqlFilter = $this->filterConverter->transform('property', '>10-<2');
-        $this->assertSame('(property > ? or property < ?)', $sqlFilter->getExpression());
+        $this->assertSame('(property > ? OR property < ?)', $sqlFilter->getExpression());
         $this->assertCount(2, $sqlFilter->getParams());
         $this->assertSame(10, $sqlFilter->getParams()[0]);
         $this->assertSame(2, $sqlFilter->getParams()[1]);

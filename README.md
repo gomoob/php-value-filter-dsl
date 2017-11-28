@@ -88,6 +88,10 @@ operators.
 For exemple `!5` or `!=5` to express "no equals to 5" or `!in('Paris','London')` ro express "no equals to Paris or
 London".
 
+### And or operators
+
+The `+` and `-` operator allow to create AND and OR SQL requests. 
+
 ### Like operator
 
 The `~` operator allows to create like SQL requests, but it is always converted to expressions equals to
