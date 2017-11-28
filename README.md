@@ -77,6 +77,8 @@ The expression language provides the following operators.
 | `in`     |             | In                       | Integer list, Double list, String list |
 | `~`      | `%7E%`      | Like                     | String                                 |
 | `!`      |             | Not                      | _see description above_                |
+| `+`      |             | And                      | _see description above_                |
+| `-`      |             | Or                       | _see description above_                |
 
 ### Not operator
 

@@ -79,15 +79,22 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('Sample string', $sqlFilter->getParams()[0]);
 
-        // Test with a complex filter and only one property (currently not supported so considered as string for now)
+        // Test with a complex filter and only one property
         // Sample complex filters with only one property would be
-        //  "<10->2"                : Lower than 10 or greater than 2
+        //  "<10+>2"                : Lower than 10 and greater than 2
         //  "'Handball'-'Football'" : Equals to 'Hand ball' or 'Foot ball'
         //  "'*ball*'+'*tennis*'"   : Like 'ball' and like 'tennis'
-        $sqlFilter = $this->filterConverter->transform('property', '<10->2');
-        $this->assertSame('property = ?', $sqlFilter->getExpression());
-        $this->assertCount(1, $sqlFilter->getParams());
-        $this->assertSame('<10->2', $sqlFilter->getParams()[0]);
+        $sqlFilter = $this->filterConverter->transform('property', '<10+>2');
+        $this->assertSame('property < ? and property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(10, $sqlFilter->getParams()[0]);
+        $this->assertSame(2, $sqlFilter->getParams()[1]);
+
+        $sqlFilter = $this->filterConverter->transform('property', '>10-<2');
+        $this->assertSame('(property > ? or property < ?)', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame(10, $sqlFilter->getParams()[0]);
+        $this->assertSame(2, $sqlFilter->getParams()[1]);
 
         // Test with a complex filter with multiple properties (currently not supported and will fail)
         try {
@@ -130,6 +137,11 @@ class SqlFilterConverterTest extends TestCase
         $this->assertSame('property = ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('Sample string', $sqlFilter->getParams()[0]);
+
+        $sqlFilter = $this->filterConverter->transform('property', "='>=<!+-in()~,0123456789abc'");
+        $this->assertSame('property = ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('>=<!+-in()~,0123456789abc', $sqlFilter->getParams()[0]);
 
         // Test with a string having '*' symbols
         $sqlFilter = $this->filterConverter->transform('property', "='*word1 *word2*'");
@@ -299,6 +311,11 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('%Sample string%', $sqlFilter->getParams()[0]);
 
+        $sqlFilter = $this->filterConverter->transform('property', "~'>=<!+-in()~,0123456789abc'");
+        $this->assertSame('property like ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('%>=<!+-in()~,0123456789abc%', $sqlFilter->getParams()[0]);
+
         // Test with a string having '*' symbols
         $sqlFilter = $this->filterConverter->transform('property', "~'word1 *word word3'");
         $this->assertSame('property like ?', $sqlFilter->getExpression());
@@ -362,6 +379,11 @@ class SqlFilterConverterTest extends TestCase
         $this->assertSame('property != ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('Sample string', $sqlFilter->getParams()[0]);
+
+        $sqlFilter = $this->filterConverter->transform('property', "!='>=<!+-in()~,0123456789abc'");
+        $this->assertSame('property != ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('>=<!+-in()~,0123456789abc', $sqlFilter->getParams()[0]);
 
         // Test with a string having '*' symbols
         $sqlFilter = $this->filterConverter->transform('property', "!='*word1 *word2*'");

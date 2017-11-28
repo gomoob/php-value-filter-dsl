@@ -35,6 +35,8 @@ use Gomoob\Filter\Tokenizer\FilterToken;
 use Gomoob\Filter\Tokenizer\FilterTokenizer;
 use Gomoob\Filter\Tokenizer\TokenizerException;
 use Gomoob\Filter\Tokenizer\StarTokenizer;
+use Gomoob\Filter\Tokenizer\LogicOperatorTokenizer;
+use Gomoob\Filter\Tokenizer\LogicOperatorToken;
 
 /**
  * Class which represents a converter to convert Gomoob query filters into SQL.
@@ -52,7 +54,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
 
         // If the key is a string then the filter is a simple filter
         if (is_string($key)) {
-            $sqlFilterWithParams = $this->transformSimpleFilter($key, $value, $context);
+            $sqlFilterWithParams = $this->transformComplexFilter($key, $value, $context);
         } // If the key is an integer then the filter is a complex filter
         elseif (is_int($key)) {
             throw new ConverterException('Complex filters are currently not implemented !');
@@ -380,7 +382,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
 
                 break;
 
-        // The first token is an 'in' operator
+            // The first token is an 'in' operator
             case FilterToken::IN:
                 // If their is not at least 4 tokens then the 'in' expression is not well formed
                 if (count($tokens) < 4) {
@@ -457,7 +459,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
                 $sb .= ')';
                 break;
 
-        // The first token is a string
+            // The first token is a string
             case FilterToken::STRING:
                 throw new ConverterException("Invalid filter expression '" . $value . "' !");
 
@@ -474,7 +476,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
 
                 break;
 
-        // All other first token are currently not supported
+            // All other first token are currently not supported
             default:
                 break;
         }
@@ -506,6 +508,51 @@ class SqlFilterConverter implements SqlFilterConverterInterface
     }
 
     /**
+     * Transforms a complex filter into an SQL equivalent instruction.
+     *
+     * @param key the filter key.
+     * @param value the filter value.
+     * @param context additional context variable to replace.
+     *
+     * @return array a key / value pair which maps the resulting SQL filter with its prepared statement parameters.
+     */
+    private function transformComplexFilter(
+        /* string */ $key,
+        /* string */ $value,
+        /* array */ $context
+    ) /* : array */ {
+        $result = ['', []];
+
+        try {
+            // Creates a tokenizer to tokenize the filter value
+            $tokenizer = new LogicOperatorTokenizer();
+
+            // Tokenize the filter
+            $tokens = $tokenizer->tokenize($value);
+
+            if (count($tokens) === 3 && ($tokens[1]->getTokenCode() === LogicOperatorToken::AND ||
+                $tokens[1]->getTokenCode() === LogicOperatorToken::OR)) {
+                $resultFirstPart = $this->transformSimpleFilter($key, $tokens[0]->getSequence(), $context);
+                $resultSecondPart = $this->transformSimpleFilter($key, $tokens[2]->getSequence(), $context);
+
+                if ($tokens[1]->getTokenCode() === LogicOperatorToken::AND) {
+                    $result[0] = "$resultFirstPart[0] and $resultSecondPart[0]";
+                } elseif ($tokens[1]->getTokenCode() === LogicOperatorToken::OR) {
+                    $result[0] = "($resultFirstPart[0] or $resultSecondPart[0])";
+                }
+                $result[1] = array_merge($resultFirstPart[1], $resultSecondPart[1]);
+            } else {
+                $result = $this->transformSimpleFilter($key, $value, $context);
+            }
+        } catch (TokenizerException $tex) {
+            // If an exception is encountered at tokenization then we consider the value to be a simple string
+            $result = [$key . ' = ?', [$value]];
+        }
+
+        return new SqlFilter($result[0], $result[1]);
+    }
+
+    /**
      * Transforms a simple filter into an SQL equivalent instruction.
      *
      * @param key the filter key.
@@ -521,22 +568,17 @@ class SqlFilterConverter implements SqlFilterConverterInterface
     ) /* : array */ {
         $result = ['', []];
 
-        try {
-            // Creates a tokenizer to tokenize the filter value
-            $tokenizer = new FilterTokenizer();
+        // Creates a tokenizer to tokenize the filter value
+        $tokenizer = new FilterTokenizer();
 
-            // Tokenize the filter
-            $tokens = $tokenizer->tokenize($value);
+        // Tokenize the filter
+        $tokens = $tokenizer->tokenize($value);
 
-            // Now parse the tokens
-            if (!empty($tokens)) {
-                $result = $this->parseFromFirstToken($key, $value, $tokens, false);
-            }
-        } catch (TokenizerException $tex) {
-            // If an exception is encountered at tokenization then we consider the value to be a simple string
-            $result = [$key . ' = ?', [$value]];
+        // Now parse the tokens
+        if (!empty($tokens)) {
+            $result = $this->parseFromFirstToken($key, $value, $tokens, false);
         }
 
-        return new SqlFilter($result[0], $result[1]);
+        return $result;
     }
 }
