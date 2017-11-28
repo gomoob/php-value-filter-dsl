@@ -47,8 +47,8 @@ class LogicOperatorTokenizer extends AbstractTokenizer
         // WARNING, ORDER IS VERY IMPORTANT
 
         // Logic operator
-        $this->addTokenInfo('(\+)', LogicOperatorToken::AND);
-        $this->addTokenInfo('(-)', LogicOperatorToken::OR);
+        $this->addTokenInfo('(\+)', LogicOperatorToken::AND_OPERATOR);
+        $this->addTokenInfo('(-)', LogicOperatorToken::OR_OPERATOR);
 
         // "Raw" values
         $this->addTokenInfo('([0-9.]+)', LogicOperatorToken::NUMBER);

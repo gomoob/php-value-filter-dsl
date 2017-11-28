@@ -34,11 +34,10 @@ namespace Gomoob\Filter\Tokenizer;
  */
 class LogicOperatorToken extends Token
 {
-
     /**
      * Token code associated to the '+' terminal.
      */
-    const AND = 1;
+    const AND_OPERATOR = 1;
 
     /**
      * Token code associated to an integer or float number terminal.
@@ -48,7 +47,7 @@ class LogicOperatorToken extends Token
     /**
      * Token code associated to the '-' terminal.
      */
-    const OR = 3;
+    const OR_OPERATOR = 3;
 
     /**
      * Token code associated to a string terminal.

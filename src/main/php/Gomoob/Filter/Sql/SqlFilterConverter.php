@@ -532,8 +532,8 @@ class SqlFilterConverter implements SqlFilterConverterInterface
 
             // If a logical expression is expressed
             if (count($tokens) === 3 &&
-                ($tokens[1]->getTokenCode() === LogicOperatorToken::AND ||
-                 $tokens[1]->getTokenCode() === LogicOperatorToken::OR)) {
+                ($tokens[1]->getTokenCode() === LogicOperatorToken::AND_OPERATOR ||
+                 $tokens[1]->getTokenCode() === LogicOperatorToken::OR_OPERATOR)) {
                 // Transform the first part of the logical expression
                 $sqlFilter1 = $this->transformSimpleFilter($key, $tokens[0]->getSequence(), $context);
 
@@ -543,9 +543,9 @@ class SqlFilterConverter implements SqlFilterConverterInterface
                 // Creates the resulting SQL logical expression
                 $result[0] = $sqlFilter1->getExpression();
 
-                if ($tokens[1]->getTokenCode() === LogicOperatorToken::AND) {
+                if ($tokens[1]->getTokenCode() === LogicOperatorToken::AND_OPERATOR) {
                     $result[0] .= ' AND ';
-                } elseif ($tokens[1]->getTokenCode() === LogicOperatorToken::OR) {
+                } elseif ($tokens[1]->getTokenCode() === LogicOperatorToken::OR_OPERATOR) {
                     $result[0] .= ' OR ';
                 }
 
