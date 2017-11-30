@@ -69,16 +69,16 @@ The expression language provides the following operators.
 
 | Operator | ASCII value | Name                     | Value type(s)                          |
 |----------|-------------|--------------------------|----------------------------------------|
-| `=`      | `%3D%       | Equals                   | Integer, Float, String                 |
+| `=`      | `%3D`       | Equals                   | Integer, Float, String                 |
 | `<`      | `%3C`       | Less than                | Integer, Float                         |
 | `<=`     | `%3C%3D`    | Less than or equal to    | Integer, Float                         |
 | `>`      | `%3E`       | Greater than             | Integer, Float                         |
 | `>=`     | `%3E%3D`    | Greater than or equal to | Integer, Float                         |
 | `in`     |             | In                       | Integer list, Double list, String list |
-| `~`      | `%7E%`      | Like                     | String                                 |
-| `!`      |             | Not                      | _see description above_                |
-| `+`      |             | And                      | _see description above_                |
-| `-`      |             | Or                       | _see description above_                |
+| `~`      | `%7E`       | Like                     | String                                 |
+| `!`      | `%21`       | Not                      | _see description above_                |
+| `+`      | `%2B`       | And                      | _see description above_                |
+| `-`      | `%2D`       | Or                       | _see description above_                |
 
 ### Not operator
 
@@ -95,7 +95,7 @@ The `+` and `-` operator allow to create AND and OR SQL requests.
 Here are sample expressions with logical operators.
 
 * `property=>5.4+<12` is translated to `property >= ? AND property < ?` with 2 parameters `[5.4,12]` ;
-* `property=~'*ball*'-~'*tennis*'` is translated to `property like ? OR property like ?` with 2 parameters 
+* `property=~'*ball*'-~'*tennis*'` is translated to `property like ? OR property like ?` with 2 parameters
   `['%ball%','%tennis%'].
 
 ### Like operator

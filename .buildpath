@@ -6,11 +6,6 @@
 			<attribute name="composer" value="source"/>
 		</attributes>
 	</buildpathentry>
-	<buildpathentry kind="src" path="src/test/php/Gomoob">
-		<attributes>
-			<attribute name="composer" value="source"/>
-		</attributes>
-	</buildpathentry>
 	<buildpathentry kind="src" path="vendor/cilex/cilex/src">
 		<attributes>
 			<attribute name="composer" value="vendor"/>
