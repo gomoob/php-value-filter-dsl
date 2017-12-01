@@ -578,7 +578,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
         /* string */ $value,
         /* array */ $context
     ) /* : array */ {
-        $result = ['', []];
+        $result = [$key . " = ''", []];
 
         try {
             // Creates a tokenizer to tokenize the filter value
