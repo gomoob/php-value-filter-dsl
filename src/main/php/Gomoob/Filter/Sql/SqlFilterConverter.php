@@ -146,7 +146,7 @@ class SqlFilterConverter implements SqlFilterConverterInterface
      * @return string the resulting equivalent string date compliant with the database in use. Please not that if
      *         parsing fails the `$str` function input parameter is returned.
      */
-    private function parseDateTime(string $str): string
+    private function parseDateTime(/* string */ $str) /* : string */
     {
         $sqlDateTime = $str;
 
