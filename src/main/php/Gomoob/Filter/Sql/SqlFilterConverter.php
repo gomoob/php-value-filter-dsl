@@ -46,6 +46,27 @@ use Gomoob\Filter\Tokenizer\LogicOperatorToken;
 class SqlFilterConverter implements SqlFilterConverterInterface
 {
     /**
+     * The parser used to parse `DateTime` strings, this parser could be `null` in which can date and time parsing is
+     * disabled.
+     *
+     * @var \Gomoob\Filter\DateTimeParserInterface
+     */
+    private $dateTimeParser;
+
+    /**
+     * Sets the parsed used to parse `DateTime` strings.
+     *
+     * Set the parser to `null` to disable `DateTime` parsing. If this is defined each one a `DateTime` is encountered
+     * it is converted to a date and time string which is compliant with the configured database.
+     *
+     * @param \Gomoob\Filter\DateTimeParserInterface $dateTimeParser the date and time parser to use.
+     */
+    public function setDateTimeParser(/* DateTimeParserInterface */ $dateTimeParser)
+    {
+        $this->dateTimeParser = $dateTimeParser;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function transform($key, /* string */ $value, /* array */ $context = []) /* : array */
@@ -117,6 +138,37 @@ class SqlFilterConverter implements SqlFilterConverterInterface
     }
 
     /**
+     * Function used to try to parse a date and time string and convert it into an equivalent string compliant with the
+     * database currently in use.
+     *
+     * @param string $str the string to parse.
+     *
+     * @return string the resulting equivalent string date compliant with the database in use. Please not that if
+     *         parsing fails the `$str` function input parameter is returned.
+     */
+    private function parseDateTime(/* string */ $str) /* : string */
+    {
+        $sqlDateTime = $str;
+
+        // If a DateTime parser is defined
+        if ($this->dateTimeParser !== null) {
+            // Try to parse the string using the \DateTime parser
+            try {
+                // Gets the PHP DateTime
+                $dateTime = $this->dateTimeParser->parse($str);
+
+                // Converts the PHP DateTime to a format which is compliant with the database currently in use
+                // For now we only support MySQL
+                $sqlDateTime = $dateTime->format('Y-m-d H:i:s');
+            } catch (\InvalidArgumentException $ieax) {
+                // Expected
+            }
+        }
+
+        return $sqlDateTime;
+    }
+
+    /**
      * Parse a filter expression from the first encountered token.
      *
      * @param string $key the filter key.
@@ -164,9 +216,12 @@ class SqlFilterConverter implements SqlFilterConverterInterface
                         $args[] = $this->parseNumberToken($secondToken);
                         break;
                     case FilterToken::STRING:
+                        // Extract string without quotes
+                        $unquotedString = $this->extractUnquotedString($secondToken);
+
                         // Try to find star tokens to know if the query if for a 'like'
                         $starTokenizer = new StarTokenizer();
-                        $starTokens = $starTokenizer->tokenize($this->extractUnquotedString($secondToken));
+                        $starTokens = $starTokenizer->tokenize($unquotedString);
 
                         // The SQL instruction to build must contain a 'like'
                         if (count($starTokens) > 1) {
@@ -201,7 +256,10 @@ class SqlFilterConverter implements SqlFilterConverterInterface
 
                             $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
                             $sb .= ' ?';
-                            $args[] = $this->extractUnquotedString($secondToken);
+
+                            // Try to take into account the string as a date, if parsing failed the unquoted string is
+                            // simply returned
+                            $args[] = $this->parseDateTime($unquotedString);
                         }
 
                         break;
@@ -252,7 +310,12 @@ class SqlFilterConverter implements SqlFilterConverterInterface
                         $sb .= $this->convertSimpleOperatorTokenToSqlString($firstToken);
                         $sb .= ' ?';
 
-                        $args[] = $this->extractUnquotedString($secondToken);
+                        // Extract string without quotes
+                        $unquotedString = $this->extractUnquotedString($secondToken);
+
+                        // Try to take into account the string as a date, if parsing failed the unquoted string is
+                        // simply returned
+                        $args[] = $this->parseDateTime($unquotedString);
 
                         break;
                     default:

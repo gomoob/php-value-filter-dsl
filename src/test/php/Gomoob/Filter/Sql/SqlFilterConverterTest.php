@@ -28,6 +28,7 @@
 namespace Gomoob\Filter\Sql;
 
 use Gomoob\Filter\Converter\ConverterException;
+use Gomoob\Filter\Parser\FormatDateTimeParser;
 
 use PHPUnit\Framework\TestCase;
 
@@ -123,6 +124,22 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(2, $sqlFilter->getParams());
         $this->assertSame('%ball%', $sqlFilter->getParams()[0]);
         $this->assertSame('%tennis%', $sqlFilter->getParams()[1]);
+
+        // Test with a DateTime string without a DateTime parser configured
+        $sqlFilter = $this->filterConverter->transform('property', "<'2015-12-01T06:00:00Z'+>'2017-12-01T06:00:00Z'");
+        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('2015-12-01T06:00:00Z', $sqlFilter->getParams()[0]);
+        $this->assertSame('2017-12-01T06:00:00Z', $sqlFilter->getParams()[1]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', "<'2015-12-01T06:00:00Z'+>'2017-12-01T06:00:00Z'");
+        $this->assertSame('property < ? AND property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('2015-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[1]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -176,6 +193,20 @@ class SqlFilterConverterTest extends TestCase
         $this->assertSame('property like ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('%word1 %word2%', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string without a DateTime parser configured
+        $sqlFilter = $this->filterConverter->transform('property', "='2017-12-01T06:00:00Z'");
+        $this->assertSame('property = ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01T06:00:00Z', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', "='2017-12-01T06:00:00Z'");
+        $this->assertSame('property = ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -197,11 +228,19 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame(54.12, $sqlFilter->getParams()[0]);
 
-        // Test with a simple date and time
+        // Test with a DateTime string without a DateTime parser configured
         $sqlFilter = $this->filterConverter->transform('property', ">'2017-01-01T00:09:01+01:00'");
         $this->assertSame('property > ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('2017-01-01T00:09:01+01:00', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', ">'2017-12-01T06:00:00Z'");
+        $this->assertSame('property > ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -223,11 +262,19 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame(54.12, $sqlFilter->getParams()[0]);
 
-        // Test with a simple date and time
+        // Test with a DateTime string without a DateTime parser configured
         $sqlFilter = $this->filterConverter->transform('property', ">='2017-01-01T00:09:01+01:00'");
         $this->assertSame('property >= ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('2017-01-01T00:09:01+01:00', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', ">='2017-12-01T06:00:00Z'");
+        $this->assertSame('property >= ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -254,6 +301,14 @@ class SqlFilterConverterTest extends TestCase
         $this->assertSame('property < ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('2017-01-01T00:09:01+01:00', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', "<'2017-12-01T06:00:00Z'");
+        $this->assertSame('property < ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -275,11 +330,19 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame(54.12, $sqlFilter->getParams()[0]);
 
-        // Test with a simple date and time
+        // Test with a DateTime string without a DateTime parser configured
         $sqlFilter = $this->filterConverter->transform('property', "<='2017-01-01T00:09:01+01:00'");
         $this->assertSame('property <= ?', $sqlFilter->getExpression());
         $this->assertCount(1, $sqlFilter->getParams());
         $this->assertSame('2017-01-01T00:09:01+01:00', $sqlFilter->getParams()[0]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', "<='2017-12-01T06:00:00Z'");
+        $this->assertSame('property <= ?', $sqlFilter->getExpression());
+        $this->assertCount(1, $sqlFilter->getParams());
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 
     /**
@@ -560,5 +623,21 @@ class SqlFilterConverterTest extends TestCase
         $this->assertCount(2, $sqlFilter->getParams());
         $this->assertSame('%ball%', $sqlFilter->getParams()[0]);
         $this->assertSame('%tennis%', $sqlFilter->getParams()[1]);
+
+        // Test with a DateTime string without a DateTime parser configured
+        $sqlFilter = $this->filterConverter->transform('property', "<'2015-12-01T06:00:00Z'->'2017-12-01T06:00:00Z'");
+        $this->assertSame('property < ? OR property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('2015-12-01T06:00:00Z', $sqlFilter->getParams()[0]);
+        $this->assertSame('2017-12-01T06:00:00Z', $sqlFilter->getParams()[1]);
+
+        // Test with a DateTime string with a DateTime parser configured
+        $this->filterConverter->setDateTimeParser(new FormatDateTimeParser());
+        $sqlFilter = $this->filterConverter->transform('property', "<'2015-12-01T06:00:00Z'->'2017-12-01T06:00:00Z'");
+        $this->assertSame('property < ? OR property > ?', $sqlFilter->getExpression());
+        $this->assertCount(2, $sqlFilter->getParams());
+        $this->assertSame('2015-12-01 06:00:00', $sqlFilter->getParams()[0]);
+        $this->assertSame('2017-12-01 06:00:00', $sqlFilter->getParams()[1]);
+        $this->filterConverter->setDateTimeParser(null);
     }
 }

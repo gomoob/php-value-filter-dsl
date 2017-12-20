@@ -25,46 +25,21 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-namespace Gomoob\Filter\Tokenizer;
+namespace Gomoob\Filter;
 
 /**
- * Custom tokenizer used to tokenize logic operators.
+ * Interface which represents a `\DateTime` parser used to convert string to `\DateTime` objects.
  *
- * @author Jiaming LIANG (jiaming.liang@gomoob.com)
+ * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-class LogicOperatorTokenizer extends AbstractTokenizer
+interface DateTimeParserInterface
 {
     /**
-     * Creates a new instance of the logic operator tokenizer.
+     * Parse a string and converts it into a `\DateTime` object.
      *
-     * @return \Gomoob\Filter\Tokenizer\LogicOperatorTokenizer the created instance.
+     * @return \DateTime the resulting `\DateTime` object.
+     *
+     * @throws \InvalidArgumentException if the provided string has not the format expected by the parser.
      */
-    public function __construct()
-    {
-        // This allows to clean our matched tokens a little
-        $this->trim = true;
-
-        // WARNING, ORDER IS VERY IMPORTANT
-
-        // Logic operator
-        $this->addTokenInfo('(\+)', LogicOperatorToken::AND_OPERATOR);
-        $this->addTokenInfo('(-)', LogicOperatorToken::OR_OPERATOR);
-
-        // "Raw" values
-        $this->addTokenInfo('([0-9.]+)', LogicOperatorToken::NUMBER);
-        $this->addTokenInfo('(\'[^\']+\')', LogicOperatorToken::STRING);
-
-        // Values prefixed with Simple operators
-        $this->addTokenInfo('(~\'[^\']+\')', LogicOperatorToken::STRING);
-        $this->addTokenInfo('(=\'[^\']+\')', LogicOperatorToken::STRING);
-        $this->addTokenInfo('(<\'[^\']+\')', LogicOperatorToken::STRING);
-        $this->addTokenInfo('(<=\'[^\']+\')', LogicOperatorToken::STRING);
-        $this->addTokenInfo('(>\'[^\']+\')', LogicOperatorToken::STRING);
-        $this->addTokenInfo('(>=\'[^\']+\')', LogicOperatorToken::STRING);
-
-        // Values prefixed with Not operator
-        $this->addTokenInfo('(!\'[^\']+\')', LogicOperatorToken::STRING);
-
-        $this->addTokenInfo('([^\'\+-]+)', LogicOperatorToken::STRING);
-    }
+    public function parse(/* string */ $str) /* : \DateTime */;
 }

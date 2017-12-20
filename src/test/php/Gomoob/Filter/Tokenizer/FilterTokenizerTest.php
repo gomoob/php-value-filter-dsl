@@ -60,7 +60,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeComplexNotIn()
     {
-
         // Test with a simple integer
         $tokens = $this->tokenizer->tokenize('!in(5,7,9)');
 
@@ -102,6 +101,18 @@ class FilterTokenizerTest extends TestCase
         $this->assertSame(',', $tokens[6]->getSequence());
         $this->assertSame('\'string_3\'', $tokens[7]->getSequence());
         $this->assertSame(')', $tokens[8]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize("!in('2017-12-01T06:00:00Z','2017-01-01T06:00:00Z')");
+
+        $this->assertCount(7, $tokens);
+        $this->assertSame('!', $tokens[0]->getSequence());
+        $this->assertSame('in', $tokens[1]->getSequence());
+        $this->assertSame('(', $tokens[2]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[3]->getSequence());
+        $this->assertSame(',', $tokens[4]->getSequence());
+        $this->assertSame('\'2017-01-01T06:00:00Z\'', $tokens[5]->getSequence());
+        $this->assertSame(')', $tokens[6]->getSequence());
     }
 
     /**
@@ -145,6 +156,13 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('=', $tokens[0]->getSequence());
         $this->assertSame('\'*word1 *word2*\'', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize("='2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('=', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 
     /**
@@ -202,7 +220,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeSimpleLessThanOrEqual()
     {
-
         // Test with a simple integer
         $tokens = $this->tokenizer->tokenize('<=5');
 
@@ -216,6 +233,13 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('<=', $tokens[0]->getSequence());
         $this->assertSame('14.69', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize("<='2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('<=', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 
     /**
@@ -225,7 +249,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeSimpleLess()
     {
-
         // Test with a simple integer
         $tokens = $this->tokenizer->tokenize("<5");
 
@@ -239,6 +262,13 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('<', $tokens[0]->getSequence());
         $this->assertSame('14.69', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize("<'2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('<', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 
     /**
@@ -248,7 +278,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeSimpleGreater()
     {
-
         // Test with a simple integer
         $tokens = $this->tokenizer->tokenize(">5");
 
@@ -262,6 +291,13 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('>', $tokens[0]->getSequence());
         $this->assertSame('14.69', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize(">'2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('>', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 
     /**
@@ -285,6 +321,13 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('>=', $tokens[0]->getSequence());
         $this->assertSame('14.69', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize(">='2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('>=', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 
     /**
@@ -294,7 +337,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeSimpleLike()
     {
-
         // Test with a simple string
         $tokens = $this->tokenizer->tokenize("~'Nantes'");
 
@@ -310,7 +352,6 @@ class FilterTokenizerTest extends TestCase
      */
     public function testTokenizeSimpleNot()
     {
-
         // Test with a simple integer
         $tokens = $this->tokenizer->tokenize("!5");
 
@@ -332,5 +373,12 @@ class FilterTokenizerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertSame('!', $tokens[0]->getSequence());
         $this->assertSame('\'This is a test\'', $tokens[1]->getSequence());
+
+        // Test with a simple date in an ISO 8601 format
+        $tokens = $this->tokenizer->tokenize("!'2017-12-01T06:00:00Z'");
+
+        $this->assertCount(2, $tokens);
+        $this->assertSame('!', $tokens[0]->getSequence());
+        $this->assertSame('\'2017-12-01T06:00:00Z\'', $tokens[1]->getSequence());
     }
 }

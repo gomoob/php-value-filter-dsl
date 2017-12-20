@@ -123,6 +123,40 @@ The following values can be used.
 * string (must be quoted with simple quotes ')
 * string with an ISO 8601 format for the dates
 
+### Date and time parsing
+
+By default when the `SqlFilterConverter` encounters a string inside an expression it simply takes it as a "standard"
+string.
+
+But you've probably business entities having date attributes and want to request those entities using data and time
+filters. To do this you can set a date and time parser on the `SqlFilterConverter` to indicate him to parse date and 
+time string and transform them to date and time string which are compliant with the database in use.
+
+For example configuring the `SqlFilterConverter` to parse ISO 8601 strings and convert them to MySQL date and time format
+is done with the following.
+
+```php
+$sqFilterConverter = new SqlFilterConverter();
+$sqlFilterConverter->setDateTimeParser(new FormatDateTimeParser());
+```
+
+By default the `FormatDateTimeParser` class uses ISO 8601 date and time parsing, but you can change its behavior with 
+the `FormatDateTimeParser->setFormat(string $format)` method. In generall you'll want to use one of the format provided
+with the PHP `DateTime` class, that's to say one of `DateTime::ATOM`, `DateTime::COOKIE`, `DateTime::ISO8601`, 
+`DateTime::RFC822`, `DateTime::RFC850`, `DateTime::RFC1036`, `DateTime::RFC1123`, `DateTime::RFC2822`, 
+`DateTime::RFC3339`, `DateTime::RSS` or `DateTime::W3C`.
+
+The parser parses date and time strings and convert them to PHP `DateTime` object, then internally the
+`SqlFilterConverter` converts the `DateTime` object to a string which is compatible with Mysql.
+
+
+For example the following transform will create a `property <= ?` expression with a value equals to
+`2017-12-01 06:00:00` which is compatible with MySQL.
+
+```php
+$sqlFilter = $filterConverter->transform('property', "<='2017-12-01T06:00:00Z'");
+```
+
 ## About Gomoob
 
 At [Gomoob](https://www.gomoob.com) we build high quality software with awesome Open Source frameworks everyday. Would

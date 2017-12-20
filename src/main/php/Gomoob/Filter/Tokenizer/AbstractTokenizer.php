@@ -34,7 +34,15 @@ use Gomoob\Filter\TokenizerInterface;
  *
  * @author Baptiste GAILLARD (baptiste.gaillard@gomoob.com)
  */
-abstract class AbstractTokenizer implements TokenizerInterface {
+abstract class AbstractTokenizer implements TokenizerInterface
+{
+
+    /**
+     * Regular expression used to identify Date and time values.
+     *
+     * @var string
+     */
+    private $dateTimeFormat = \DateTime::ISO8601;
 
     /**
      * List which holds all our token informations.
@@ -54,7 +62,8 @@ abstract class AbstractTokenizer implements TokenizerInterface {
     /**
      * {@inheritDoc}
      */
-    public function addTokenInfo(/* string */ $regex, /* int */ $tokenCode) {
+    public function addTokenInfo(/* string */ $regex, /* int */ $tokenCode)
+    {
         // The user can pass a regular expression string and a token code to the method. The method will then add the
         // "^" character to the user supplied regular expression. It causes the regular expression to match only the
         // beginning of a string. This is needed because we will be removing any token always looking for the next token
@@ -65,7 +74,8 @@ abstract class AbstractTokenizer implements TokenizerInterface {
     /**
      * {@inheritDoc}
      */
-    public function tokenize(/* string */ $string) /* : array */ {
+    public function tokenize(/* string */ $string) /* : array */
+    {
         $tokens = [];
 
         // First we clean our string
@@ -82,7 +92,6 @@ abstract class AbstractTokenizer implements TokenizerInterface {
 
                 // If a known token has been encountered
                 if (preg_match($info->getRegex(), $s, $matches)) {
-
                     // A token has been found
                     $match = true;
 

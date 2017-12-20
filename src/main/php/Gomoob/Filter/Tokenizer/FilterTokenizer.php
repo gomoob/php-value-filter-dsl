@@ -34,7 +34,6 @@ namespace Gomoob\Filter\Tokenizer;
  */
 class FilterTokenizer extends AbstractTokenizer
 {
-
     /**
      * Creates a new instance of the filter tokenizer.
      *
@@ -42,7 +41,6 @@ class FilterTokenizer extends AbstractTokenizer
      */
     public function __construct()
     {
-
         // This allows to clean our matched tokens a little
         $this->trim = true;
 
