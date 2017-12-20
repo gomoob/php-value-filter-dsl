@@ -90,7 +90,7 @@ class FormatDateTimeParser implements DateTimeParserInterface
                         '%s method received an \'%s\' date string which is not compliant with the configured ' .
                         'format !',
                         __METHOD__,
-                        $value
+                        $str
                     )
                 );
             }
