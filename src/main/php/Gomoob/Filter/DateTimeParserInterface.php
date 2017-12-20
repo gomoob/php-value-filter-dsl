@@ -41,5 +41,5 @@ interface DateTimeParserInterface
      *
      * @throws \InvalidArgumentException if the provided string has not the format expected by the parser.
      */
-    public function parse(string $str): \DateTime;
+    public function parse(/* string */ $str) /* : \DateTime */;
 }

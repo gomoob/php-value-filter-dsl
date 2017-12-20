@@ -65,7 +65,7 @@ class FormatDateTimeParser implements DateTimeParserInterface
     /**
      * {@inheritDoc}
      */
-    public function parse(string $str): \DateTime
+    public function parse(/* string */ $str) /* : \DateTime */
     {
         $date = \DateTime::createFromFormat($this->format, $str);
 
